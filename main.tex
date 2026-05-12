@@ -686,6 +686,511 @@ The figure below illustrates the program design flow of the unified WhatsApp for
     \label{fig:program_design_flow}
 \end{figure}
 
+% ══════════════════════════════════════════════════════════════════════════════
+% CHAPTER 4: IMPLEMENTATION
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\chapter{IMPLEMENTATION}
+
+% ------ Section 4.1 ---------------------------------------------------
+\section{Introduction}
+
+This chapter describes how the WhatsApp forensic toolkit was built. It is a command-line digital forensic solution developed for the investigation of WhatsApp communications on Android devices operating within an emulated environment. The toolkit is written primarily in Bash scripting, with SQLite used for all database queries and Python used for report formatting and PDF generation. These components work together to provide a complete investigation workflow that moves from evidence acquisition up to a court-ready report without requiring any third-party commercial software.
+
+The development adopted the Association of Chief Police Officers (ACPO) Good Practice Guide for Digital Evidence \citep{acpo2012}, which defines four principles for handling digital evidence in a manner that ensures its admissibility in legal proceedings. These principles require that digital data is not changed, that access to original data is restricted to competent individuals, that a complete audit trail is maintained, and that the investigating officer takes overall responsibility for compliance with those principles. Every module and every log entry produced by the toolkit has been designed to satisfy at least one of these requirements.
+
+In addition to the ACPO framework, the toolkit has been designed to comply with Malawi's Electronic Transactions and Cyber Security Act No.\ 33 of 2016 (ETCS Act). Section 16(1) of the ETCS Act confirms that an electronic record cannot be rejected as evidence because it exists in electronic form. Section 16(2) further requires courts to consider the reliability of the system that generated the record and the integrity of the information it contains. The toolkit directly addresses both requirements: reliability is enforced through procedural gating that prevents analysis from proceeding unless integrity verification has passed, and integrity is demonstrated through SHA-256 cryptographic hashing recorded in a persistent chain-of-custody log. The investigator's identity is taken at case creation and attached to every log entry. This satisfies the identification requirement. By embedding these requirements into the software architecture, the toolkit produces evidence that is to be ruled admissible than evidence collected through informal methods such as manual screenshots or unverified scripts.
+
+% ------ Subsection 4.1.1 -----------------------------------------------
+\subsection{Core Engineering Principles}
+
+The implementation of this toolkit was governed by four engineering principles; every design decision made during implementation was guided by them:
+
+\textbf{Forensic Integrity.} Evidence is preserved in its original state at all times. No operation, whether intentional or accidental, may modify the original data. This is enforced at the filesystem level through read-only permissions and file immutability flags, at the database access level through SQLite's read-only mode, and through exit-code gating that cancels the workflow if any phase fails.
+
+\textbf{Standards Compliance.} Every module is designed to satisfy one or more ACPO principles. Compliance is included in the architecture of the toolkit rather than treated as a documentation exercise performed after development.
+
+\textbf{Reproducibility.} Every operation is logged with a timestamp, the investigator's identity, the input parameters used, and the outcome. An independent examiner can reconstruct the exact sequence of forensic activities and verify the results independently, satisfying ACPO Principle 3.
+
+\textbf{Accessibility.} The command-line interface uses numbered menus, input validation at every data-entry point, and descriptive error messages. These features are intended to accommodate investigators with varying levels of technical expertise without compromising forensic rigour.
+
+% ------ Subsection 4.1.2 -----------------------------------------------
+\subsection{Toolkit Workflow Overview}
+
+The toolkit has a six-phase linear workflow. Each phase must complete successfully before the next may begin. This gate-based approach prevents unverified or potentially corrupted evidence from progressing into analysis or reporting, directly implementing ACPO Principle 1. The six phases are: Case Initialisation, Environment Setup, Evidence Acquisition, Integrity Verification, Forensic Analysis, and Report Generation. A failure at any phase causes the toolkit to exit with a non-zero status code and display a clear error message, blocking all subsequent phases until the failure is resolved. This procedural gating is implemented in \texttt{wa-forensics.sh} through conditional checks on the exit codes returned by each module.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=\textwidth]{assets/images/fig4_1_workflow.png}
+%     \caption{Six-phase linear workflow diagram showing the toolkit's main menu and workflow banner}
+%     \label{fig:workflow}
+% \end{figure}
+
+% ------ Section 4.2 ---------------------------------------------------
+\section{Development Environment}
+
+% ------ Subsection 4.2.1 -----------------------------------------------
+\subsection{Platform and Tool Specification}
+
+The toolkit was developed and tested on a controlled Ubuntu 22.04 Linux environment to ensure it worked properly and reliably. The full setup and tools used during the implementation are specified in Table~\ref{tab:devenv} below.
+
+\begin{table}[h]
+    \centering
+    \caption{Development environment and toolchain summary}
+    \label{tab:devenv}
+    \begin{tabular}{p{3cm} p{4cm} p{2.5cm} p{5cm}}
+        \toprule
+        \textbf{Component} & \textbf{Technology} & \textbf{Version} & \textbf{Role in the toolkit} \\
+        \midrule
+        Operating System   & Ubuntu LTS                       & 22.04+           & Execution platform and filesystem host \\
+        Primary Language   & GNU Bash                         & 5.1.16           & Core implementation of all seven forensic modules \\
+        Database Engine    & SQLite                           & 3.37.2           & WhatsApp database interrogation in read-only mode \\
+        Android Interface  & Android Debug Bridge (ADB)       & 33.0.3           & Device detection, data extraction, property queries \\
+        Hashing Utility    & sha256sum                        & GNU coreutils 8.32 & Cryptographic integrity verification \\
+        PDF Generation     & Python 3                         & 3.10+            & Report formatting and PDF generation \\
+        Emulation          & Android Virtual Device (AVD)     & Android 11       & Emulated environment for WhatsApp account linking \\
+        Filesystem Tools   & chattr, lsattr                   & e2fsprogs 1.46.5 & Protect evidence files from being changed by setting and checking immutable file attributes \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+% ------ Subsection 4.2.2 -----------------------------------------------
+\subsection{Justification of Bash as Primary Implementation Language}
+
+GNU Bash was chosen as the main programming language for the WhatsApp forensic toolkit for Android because it works well in forensic workstation environments and is simple to use on Linux systems.
+
+\textbf{Zero-dependency deployment.}
+Bash comes already installed on most Linux systems used in digital forensics, such as Kali Linux, CAINE, and SIFT Workstation. Because the toolkit was fully written in Bash, there was no need to install extra software, interpreters, or runtime packages. This is very important in secure forensic environments where internet access may not be available or installing new software may not be technically allowed.
+
+\textbf{Direct filesystem access.}
+Bash allows direct interaction with the Linux filesystem. For example, when the \texttt{acquisition.sh} script runs the \texttt{adb pull} command, data is copied directly from the Android device to the computer storage. This reduces the chances of data corruption.
+
+\textbf{Deterministic process control.}
+Bash gives good control over how commands are executed. The toolkit checks the result of every important command to make sure each operation is completed successfully. This helps prevent failed or incomplete processes from affecting the integrity of the evidence.
+
+\textbf{Audit trail generation.}
+Bash includes built-in tracing features such as \texttt{set -x}, which can record every command that is executed and its result. These records help create an activity log that documents all actions performed during the forensic process, supporting proper evidence handling procedures.
+
+\textbf{Courtroom transparency.}
+Bash scripts are easy to read and understand. During legal proceedings, an expert can show the script code in court and explain how the toolkit works. There are no hidden compiled files or complex background processes, making it easier for others to verify and understand the forensic procedures used.
+
+% ------ Subsection 4.2.3 -----------------------------------------------
+\subsection{Role of Python in the Toolkit}
+
+Python was used in a limited and controlled manner within the WA-Forensics Toolkit. Its role was restricted to report generation and schema variation detection, while all core forensic operations were performed entirely using Bash scripts.
+
+For report generation, Python was used to format extracted findings and compile them into structured HTML and PDF reports. Python's stronger text-processing and formatting capabilities made it suitable for creating readable and well-organised forensic reports without affecting the main acquisition and extraction workflow.
+
+All major forensic processes, including database querying, artefact extraction, evidence handling, and data processing, were implemented fully in Bash. This design preserved the lightweight and zero-dependency nature of the toolkit, ensured direct interaction with the Linux filesystem, and reduced reliance on additional software environments during forensic investigations. By limiting Python to reporting and schema identification tasks only, the toolkit maintained a simple and transparent forensic workflow while still benefiting from Python's advanced formatting and parsing capabilities.
+
+% ------ Subsection 4.2.4 -----------------------------------------------
+\subsection{Justification of SQLite for Database Interrogation}
+
+SQLite was selected as the database interrogation engine because WhatsApp stores its data directly in SQLite database files such as \texttt{msgstore.db} and \texttt{wa.db}. Using SQLite allowed the toolkit to examine the databases in their original format without converting the data into another form. This helped reduce the chances of errors or accidental modification of evidence during the forensic process. SQLite also supports read-only and immutable access modes, which provided an extra level of protection by ensuring that the database files could not be changed during analysis.
+
+Another reason for selecting SQLite was its built-in integrity checking feature called \texttt{PRAGMA integrity\_check}. This feature allowed the toolkit to verify the internal structure of the database and detect issues such as corrupted pages, damaged indexes, or incomplete records that normal hash verification may not detect. By using SQLite directly, the toolkit was able to perform reliable and transparent examination of WhatsApp data while maintaining the integrity of the evidence throughout the investigation process.
+
+% ------ Section 4.3 ---------------------------------------------------
+\section{Phase 1: Case Initialisation}
+
+Investigation begins with case initialisation, managed by the \texttt{case\_manager.sh} module. When a new case is created, the toolkit assigns a unique case identifier in the format \texttt{CASE-YYYYMMDD-HHMMSS}, generated from the creation timestamp. The investigator may accept this identifier or use a custom one subject to format validation. The module creates a directory structure within the case's root folder. This structure separates original evidence from operational data at the filesystem level, which is a critical design decision for forensic integrity.
+
+The separation of \texttt{evidence/} and \texttt{operations/} enables the toolkit to lock only the \texttt{evidence/} folder after acquisition, preventing any modification of the original artefacts. The \texttt{operations/} folder must remain writable so that logs, hash records, and reports can be written as the investigation progresses. Locking the entire case folder would prevent the toolkit from recording its own activity, which would break the chain-of-custody log and cause the toolkit to block the case by flagging changes in hash values.
+
+The module prompts the investigator to enter their name, badge number, organisation, warrant number, and a brief case description. These details are saved to a \texttt{case\_info.txt} file within the operations folder and are also attached in the session header that appears at the top of every subsequent menu screen. Figure~\ref{fig:case_creation} shows the case creation screen.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{assets/images/case-initialization.png}
+    \caption{Screenshot of the case creation menu showing investigator details input and auto-generated case ID}
+    \label{fig:case_creation}
+\end{figure}
+
+% ------ Section 4.4 ---------------------------------------------------
+\section{Phase 2: Environment Setup - Emulator and Device Linking}
+
+Before evidence acquisition can happen, the forensic environment must be set up. This phase, implemented within the controller \texttt{wa-forensics.sh}, involves initialising an Android Virtual Device (AVD) and linking the evidence device's WhatsApp account to the emulated environment using WhatsApp's Linked Devices feature.
+
+The emulator is required because the toolkit acquires WhatsApp databases from the evidence device through a controlled, isolated emulated environment. The AVD ensures that no live WhatsApp traffic can alter the evidence after acquisition. The linking process verifies that the WhatsApp data format on the emulator is compatible with that of the original evidence device, confirming schema compatibility before an acquisition attempt.
+
+Specifically, this phase performs:
+\begin{itemize}
+    \item Android emulator initialisation and boot-readiness check
+    \item WhatsApp application version verification and compatibility matching between the evidence device and the emulator
+    \item WhatsApp account linking via the Linked Devices QR code feature
+    \item Data format match validation to confirm that the acquired database schema aligns with the emulator's WhatsApp installation
+\end{itemize}
+
+The toolkit in \texttt{Acquisition.sh} uses the ADB command \texttt{adb devices} to confirm that an emulator is connected and then polls the \texttt{sys.boot\_completed} system property in a loop until the device reports a fully booted state. This ensures that acquisition attempts are not made against an emulator that has not yet mounted the required data partitions.
+
+% ------ Section 4.5 ---------------------------------------------------
+\section{Phase 3: Evidence Acquisition Module}
+
+The Evidence Acquisition Module establishes communication with the evidence device, validates its readiness, extracts WhatsApp artefacts, and applies initial write protection. This is implemented in \texttt{Acquisition.sh} using a structured sequence of ADB commands.
+
+% ------ Subsection 4.5.1 -----------------------------------------------
+\subsection{Targeted Acquisition Strategy}
+
+A fundamental design decision in the WA-Forensics Toolkit is the adoption of a targeted acquisition approach rather than full device imaging, which can range from 64\,GB to 256\,GB on a modern Android smartphone and require many hours to complete. The toolkit extracts only the WhatsApp-relevant data paths, which reduces acquisition time from hours to minutes and reduces the storage footprint of each case. This decision is justified by three operational considerations.
+
+First, the scope of the investigation is to focus on WhatsApp communications, so acquiring non-WhatsApp data would introduce unnecessary material that is outside the investigation scope. Second, this strategy reduces the risk of exposing personal data unrelated to the investigation, which has implications under data protection principles. Third, a smaller evidence set is faster to hash, faster to verify, and produces more readable reports, all of which improve investigative efficiency and benefit investigators.
+
+The acquisition targets the following WhatsApp data paths on the Android device:
+\begin{itemize}
+    \item \texttt{/sdcard/WhatsApp/Databases} -- primary message database files (\texttt{msgstore.db}, \texttt{wa.db})
+    \item \texttt{/sdcard/WhatsApp/Media} -- shared images, videos, audio messages, documents, and voice notes
+    \item \texttt{/sdcard/WhatsApp/Logs} -- application log files
+    \item \texttt{/sdcard/WhatsApp/Backups} -- local WhatsApp backup archives
+    \item \texttt{/data/data/com.whatsapp/databases} -- internal database storage
+    \item \texttt{/data/data/com.whatsapp/shared\_prefs} -- application preference files
+\end{itemize}
+
+% ------ Subsection 4.5.2 -----------------------------------------------
+\subsection{Acquisition Workflow}
+
+The acquisition module performs a workflow in four stages. Each stage is validated before the next one, and any failure causes the module to exit and blocks progression to subsequent phases.
+
+\textbf{Stage 1 : Data copy to sdcard.} The \texttt{/data/data/com.whatsapp/} directory is protected by Android's application sandbox, so the toolkit first elevates to superuser using the \texttt{su} command and then copies the WhatsApp application directory to the accessible \texttt{/sdcard/} partition using the \texttt{cp} command. This is because the \texttt{adb pull} command cannot read directly from protected application directories without root access. Figure~\ref{fig:acq_stage1} shows the acquisition module elevating to root and copying to the accessible partition.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{assets/images/fig4.3.jpg}
+    \caption{Acquisition module elevating to root and copying application data to the accessible partition}
+    \label{fig:acq_stage1}
+\end{figure}
+
+\textbf{Stage 2 : Evidence pulled to the forensic workstation.} Once the data is placed on the accessible \texttt{sdcard} partition, the \texttt{adb pull} command transfers it to the case folder on the forensic workstation. The toolkit confirms that the destination directory exists and is not empty before proceeding. Figure~\ref{fig:acq_stage2} shows the acquisition module pulling application data and media to the case evidence folder.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{assets/images/fig4.4.png}
+    \caption{Acquisition module pulling application data and media to the case evidence folder}
+    \label{fig:acq_stage2}
+\end{figure}
+
+\textbf{Stage 3 : Write protection applied to the evidence/ folder.} This ordering is critical: hashing must occur after write protection is applied so that the hash values reflect the state of the evidence as it existed when it was locked. Figure~\ref{fig:acq_stage3} shows the two layers of protection applied simultaneously.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{assets/images/fig4.5.png}
+    \caption{Acquisition module applying two layers of write protection simultaneously}
+    \label{fig:acq_stage3}
+\end{figure}
+
+\textbf{Stage 4 : SHA-256 hashing.} The module computes three separate SHA-256 hash values: one for the WhatsApp application data folder, one for the media folder, and one for the entire \texttt{evidence/} directory. These values are used in the Integrity module, which will later verify that nothing has been changed. Figure~\ref{fig:acq_complete} shows the acquisition module's terminal output on successful completion, including the computed hash values and the folder size summary.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=\textwidth]{assets/images/fig4_6_acq_complete.png}
+%     \caption{Acquisition.sh output showing ADB connection, file counts, SHA-256 hash values, and the ACQUISITION COMPLETE confirmation banner}
+%     \label{fig:acq_complete}
+% \end{figure}
+
+% ------ Section 4.6 ---------------------------------------------------
+\section{Integrity Verification \& Preservation Module}
+
+The integrity verification module ensures that the acquired WhatsApp evidence remains protected from any form of alteration so as to ensure that the evidence is admissible in a court of law. This module enforces ACPO Principle 1, which states that data stored in a storage medium must not be altered or changed, as that data may later be presented in court. To achieve this, it implements multi-level cryptographic verification to confirm that the acquired evidence has not been altered since acquisition. It then produces a verifiable record of this confirmation that persists throughout the investigation process.
+
+The module is automatically called by the toolkit after acquisition. If verification fails, the case is immediately blocked and no analysis is permitted on that case. This implementation ensures that investigators cannot proceed with compromised evidence. Figure~\ref{fig:integrity_fail} shows the toolkit blocking a case following an integrity failure.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=\textwidth]{assets/images/fig4_7_integrity_fail.png}
+%     \caption{Screenshot of the INTEGRITY VERIFICATION FAILED screen showing the red error banner and the list of failed checks, corresponding to the CASE-20260501-103328 test case recorded in the audit log}
+%     \label{fig:integrity_fail}
+% \end{figure}
+
+% ------ Subsection 4.6.1 -----------------------------------------------
+\subsection{Hierarchical Hashing Strategy}
+
+The module implements a two-level hierarchical hashing strategy. Through this design, verification efficiency is balanced with granularity of fault isolation; for instance, if the master case folder hash fails verification, investigators can immediately descend to the individual evidence folder hashes to identify exactly which file was altered.
+
+\textbf{Level 1 : Evidence folders hashing.} The evidence folders, WhatsApp app data and WhatsApp media data, are hashed individually using SHA-256 and the hash values are recorded in a structured hash record file stored in \texttt{hash\_registry.txt} in the operations folder within the case folder.
+
+\textbf{Level 2 : Case folder hashing.} After hashing the evidence folders, the master case folder is also hashed using SHA-256 to ensure nothing is added or removed from the evidence folder and that it contains all its related data in its original form.
+
+During the verification process, the toolkit recalculates the hash values using the same algorithm, SHA-256, and then compares the hash values with those calculated earlier and stored in the \texttt{hashes.txt} file. The integrity verification module also checks whether write protection was enforced on the evidence folders after acquisition. If the hash values match and all verification passes, analysis may continue; if they fail, the case is blocked and no analysis is performed. This ensures the toolkit presents court-admissible, forensically sound evidence that is free from all tampering.
+
+% ------ Subsection 4.6.2 -----------------------------------------------
+\subsection{SQLite Database Structural Integrity Verification}
+
+Beyond filesystem-level hashing, WhatsApp databases require database-level structural verification. A database file can have a matching SHA-256 hash yet contain internal corruption that renders queries unreliable or produces incorrect results. The integrity module addresses this by running SQLite's \texttt{PRAGMA integrity\_check} on each acquired database file. Figure~\ref{fig:integrity_check} shows the structural integrity check with read-only mode enforced.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{assets/images/fig4.8.png}
+    \caption{Structural integrity check with read-only mode enforced}
+    \label{fig:integrity_check}
+\end{figure}
+
+The combination of SHA-256 file hashing and \texttt{PRAGMA integrity\_check} provides comprehensive evidence integrity assurance, ensuring that evidence is not only unmodified at the byte level but also structurally sound for querying. This high level of evidence integrity assurance cannot be achieved by either method alone, making this approach one that leaves the evidence strongly defensible and admissible in court.
+
+% ------ Section 4.7 ---------------------------------------------------
+\section{Phase 5: Forensic Analysis Module}
+
+The Forensic Analysis module is the central intelligence component of the toolkit. It transforms raw WhatsApp database data from WhatsApp records into well-structured artefacts that investigators can interpret and use as evidence. The module was implemented using two Bash scripting files: \texttt{chat\_analyzer.sh} and \texttt{db\_handler.sh}. It executes structured SQLite queries against verified WhatsApp databases to extract required artefacts across six analytical dimensions.
+
+The analysis module is designed to run after the evidence acquisition, write protection, hashing, and integrity validation phases have been completed successfully. There are two primary evidence databases analysed: \texttt{msgstore.db}, which contains all WhatsApp messages, group chats, media references, timestamps, and communication records; and \texttt{wa.db}, which contains contact information, WhatsApp account metadata, and saved display names.
+
+The primary purpose of this module is to automate the extraction, interpretation, and classification of forensic artefacts from WhatsApp databases while maintaining forensic standards and compliance. All database operations are performed using SQLite's read-only mode and filesystem-level write protection. Figure~\ref{fig:sqlite_readonly} shows the SQLite engine flag enforcing read-only permission.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{assets/images/fig4.9.png}
+    \caption{SQLite engine flag enforcing read-only permission}
+    \label{fig:sqlite_readonly}
+\end{figure}
+
+This enforcement means that even if the filesystem-level write protection were to be weakened or misconfigured, SQLite would refuse to write to the evidence database. Only \texttt{SELECT} statements, \texttt{.schema}, and \texttt{.tables} meta-commands are permitted, while any attempt to execute \texttt{INSERT}, \texttt{UPDATE}, \texttt{DELETE}, \texttt{DROP}, \texttt{VACUUM}, or \texttt{REINDEX} is blocked. This approach aligns with digital forensic standards that require that original evidence should not be modified during the investigation process \citep{acpo2012, nist2014mobile}.
+
+% ------ Subsection 4.7.1 -----------------------------------------------
+\subsection{Schema Detection and Adaptive Querying}
+
+The WhatsApp database schemas vary across different versions. Research by \citet{lekhac2022} documented that table names, column names, and data types change between WhatsApp releases. The message table has been named both \texttt{message} and \texttt{messages} in different versions; some metadata columns present in older versions may be renamed, relocated, or removed in newer releases \citep{anglano2014}. These schema variations cause forensic tools to fail because of hard-coded SQLite queries that fail on databases from mismatched WhatsApp versions.
+
+The toolkit addresses this through a runtime schema inspection approach implemented in \texttt{chat\_analyzer.sh}. Figure~\ref{fig:schema_detect} shows the discovery of the actual database schema during execution.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{assets/images/fig4.10.png}
+    \caption{Runtime discovery of the actual database schema during execution}
+    \label{fig:schema_detect}
+\end{figure}
+
+Detection functions exist for the chat, jid, media, and link tables. Column existence is also verified using \texttt{PRAGMA table\_info}. Figure~\ref{fig:schema_arch} illustrates the Schema-Aware Query Execution Architecture implementation of the analysis module.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{assets/images/fig4.11.png}
+    \caption{Schema-Aware Query Execution Architecture of the analysis module}
+    \label{fig:schema_arch}
+\end{figure}
+
+The architecture demonstrates how each analysis function integrates schema detection and adaptive queries while preserving strict read-only access to the evidence databases. The detected schema information is stored in a configuration file that is used by all forensic analysis modules including Communication Profiling, Chat Reconstruction, Contact Mapping, Media Analysis, Deleted Message Detection, and URL Extraction before each executes its query.
+
+This adaptive approach ensures toolkit compatibility across WhatsApp database versions from 2016 to the present, making the toolkit version-independent, reducing query failure, improving scalability, and making it more robust than tools with static query structures \citep{fayyad2022,lekhac2022book}.
+
+% ------ Subsection 4.7.2 -----------------------------------------------
+\subsection{Communication Profiling}
+
+The Communication Profiling function identifies the relationship between the device owner and communicating parties, interaction behaviour, and dominant contacts in the WhatsApp evidence database. This enables investigators to identify which individuals play specific roles within the suspected communications and prioritise those conversations for deeper forensic examination. Figure~\ref{fig:comm_profiling} shows a sample communication profiling output extracted during toolkit testing.
+
+The function groups messages according to contact identifiers (JIDs) and calculates communication metrics for each participant, such as the total number of exchanged messages, first communication timestamp, last communication timestamp, number of active communication days, and message distribution patterns. These metrics are calculated using aggregate SQLite functions.
+
+The results help investigators identify contacts that communicate with the device owner; high-volume communication relationships indicate individuals of interest. If a suspect exchanges an unusually high number of messages with a specific contact while having minimal interaction with others, that contact becomes a priority of investigation. Results are exported to CSV and plain-text report files for review.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=\textwidth]{assets/images/fig4_12_comm_profiling.png}
+%     \caption{Sample communication profiling output showing ranked contacts by message volume, first contact date, last contact date, and active days}
+%     \label{fig:comm_profiling}
+% \end{figure}
+
+% ------ Subsection 4.7.3 -----------------------------------------------
+\subsection{Chat Reconstruction}
+
+Investigators can reconstruct complete communication timelines between the device owner and specific WhatsApp contacts. This function converts raw database records into human-readable conversation sequences that investigators can review chronologically during forensic examinations.
+
+Messages are extracted with their associated contacts. Each message is shown with direction, message type (text, media, or empty), and the conversation identifier from the WhatsApp message database. Messages are arranged according to their timestamps to reconstruct the exact sequence of communication events, enabling the investigator to conduct timeline analysis effectively and understand the communication as it occurred on the device.
+
+The direction of each message is determined by analysing WhatsApp Jabber Identifiers (JIDs) and the \texttt{key\_from\_me} field. A message with \texttt{key\_from\_me = 1} is classified as outgoing communication sent by the device owner. A message with \texttt{key\_from\_me = 0} and the \texttt{@s.whatsapp.net} suffix in the sender field is classified as incoming from an external user. Group chat messages are identified by the \texttt{@g.us} suffix in the conversation identifier. This classification approach is documented by \citet{anglano2014} and \citet{lekhac2022book}. Depending on the database values present, messages may be categorised as text, image, video, audio or voice, document attachments, or contact details.
+
+The final reconstructed conversation is exported to output files such as CSV and plain-text reports. Chat reconstruction is important because isolated messages lack contextual meaning when viewed independently. Reconstructing conversations in chronological order enables investigators to accurately interpret intent, response patterns, planning behaviour, and communication context.
+
+% ------ Subsection 4.7.4 -----------------------------------------------
+\subsection{Contact Mapping}
+
+The WhatsApp application identifies users using WhatsApp Jabber Identifiers (JIDs), which appear as strings like \texttt{265888123456@s.whatsapp.net} \citep{lekhac2022book}. These strings are difficult for non-technical investigators to interpret without resolution. The toolkit resolves these identities into forms that investigators and courts can understand. For example, the string \texttt{795012973834586@s.whatsapp.net} becomes more meaningful when resolved to \emph{John Banda, +265888123456}, showing the actual telephone number and the saved name if it was saved in the device owner's phonebook.
+
+This function can also reveal situations where a contact exists in communication records but has no corresponding saved name within the device contact directory. Unidentified contacts may become important investigative leads requiring further examination.
+
+The exported results may support several investigative objectives, including identification of key communication partners, verification of saved identities, and detection of unknown or unsaved contacts.
+
+% ------ Subsection 4.7.5 -----------------------------------------------
+\subsection{Media Analysis}
+
+Media files shared in WhatsApp conversations are extracted, decoded, and classified, as they are among the most important artefacts referenced in the WhatsApp databases. Images, videos, voice notes, documents, stickers, and shared links carry critical evidence value in modern digital investigations \citep{anglano2014}.
+
+Media files are extracted from the \texttt{msgstore.db} WhatsApp message database for all records containing media references. Each media record is analysed to determine its storage location and media type. The function extracts details including media file paths, file names, MIME types, WhatsApp media type codes, CDN URLs, thumbnail references, message timestamps, conversation identifiers, and sender or receiver contact information.
+
+Each entry is classified as \texttt{LOCAL}, \texttt{CDN}, or \texttt{NO FILE} storage location, as documented by \citet{lekhac2022book}. Figure~\ref{fig:media_decision} illustrates the decision process used by this module to identify the storage location of media.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/images/fig4.13.png}
+    \caption{Decision process for identifying the storage location of media artefacts}
+    \label{fig:media_decision}
+\end{figure}
+
+In addition to classification, the Media Analysis module decodes WhatsApp's internal \texttt{media\_wa\_type} values into investigator-readable labels. WhatsApp stores media categories using numeric codes, which are not easily interpretable without decoding \citep{lekhac2022book}. The toolkit translates these codes into descriptive, forensically meaningful labels as shown in Table~\ref{tab:media_types}.
+
+\begin{table}[h]
+    \centering
+    \caption{WhatsApp \texttt{media\_wa\_type} codes, descriptions, and forensic significance}
+    \label{tab:media_types}
+    \begin{tabular}{p{1.5cm} p{2.5cm} p{3.5cm} p{6cm}}
+        \toprule
+        \textbf{Code} & \textbf{Media Description} & \textbf{Typical File Indicators} & \textbf{Forensic Significance} \\
+        \midrule
+        1 & Image         & .jpg, .png, .jpeg, .webp         & Images may contain evidence such as individuals, locations, screenshots, and context relevant to investigations. \\
+        2 & Audio         & .aac, .mp3, .opus                & Audio artefacts help to uncover conversations, threats, verbal agreements, or planning discussions useful during forensic examinations. \\
+        3 & Video         & .mp4, .3gp, .mkv                 & Videos can capture incidents, meetings, and activities related to a case. \\
+        4 & Contact Card  & .vcf                             & Can reveal shared identities, phone numbers, and relationships. \\
+        5 & Location Share & GPS coordinates, map links      & Supports location analysis, movement tracking, and reconstruction of user activity patterns. \\
+        6 & Document      & .pdf, .docx, .xlsx, .pptx, .txt & Documents may carry contracts, receipts, confidential files, and financial records. \\
+        7 & GIF           & .gif, animated .webp             & Show contextual or behavioural indicators that help in understanding communication intent or emotional responses. \\
+        8 & Sticker       & .webp                            & Convey emotional tone, reactions, hidden meanings, or communication patterns. \\
+        9 & URL Link      & Web URLs, social media links     & Direct investigators to external evidence sources such as websites, cloud storage, videos, or social media platforms. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Instead of presenting investigators with \texttt{media\_wa\_type = 3}, the toolkit outputs \texttt{VIDEO} and its path. This translation improves report readability and allows non-technical investigators and legal professionals to interpret media evidence more effectively. The extracted media records are exported into structured CSV and text-based reports, enabling investigators to review shared multimedia evidence, identify deleted files, and detect suspicious file-sharing activity.
+
+% ------ Subsection 4.7.6 -----------------------------------------------
+\subsection{Deleted Message Detection}
+
+The Deleted Message Detection function discovers WhatsApp messages that have been removed using WhatsApp's Delete for Everyone feature. Any attempt to erase evidence may indicate that a suspect is trying to hide information from investigators. The ability of this toolkit to detect deleted messages, even when their original content is not available, provides investigative insight.
+
+When a message is deleted using the Delete for Everyone feature, WhatsApp does not physically remove the record but instead sets a deletion flag, replaces the original message content with a system placeholder, and retains metadata within the database \citep{anglano2014,lekhac2022book}.
+
+The function queries WhatsApp database records for message deletion indicators to identify conversations in which message removal activity occurred. It also records information about who deleted the message. Even if the actual message content has been deleted, investigators can use the retained metadata to establish timeline reconstruction, pattern of evidence, distraction behaviour, and intent analysis. For example, a sudden increase in deletion activity before device seizure after a criminal incident may indicate deliberate attempts to conceal communication evidence.
+
+The extracted deletion records and their metadata are exported into structured forensic reports for investigator review and court presentation.
+
+% ------ Subsection 4.7.7 -----------------------------------------------
+\subsection{URL Extraction}
+
+The URL Extraction function detects and extracts all hyperlinks shared in WhatsApp conversations. Hyperlinks carry investigative intelligence because they lead to external websites, cloud storage platforms, social media accounts, malware downloads, phishing infrastructure, or web-based communication resources associated with criminal activity. Research has confirmed that URLs shared through instant messaging applications like WhatsApp can provide valuable evidence and investigative leads during digital forensic examinations \citep{mahajan2013,anglano2014}.
+
+Each URL is categorised by its platform, including YouTube, Facebook, Instagram, TikTok, Telegram, Google Drive, Dropbox, and WhatsApp CDN links. The function implements this capability by querying message content stored in \texttt{msgstore.db} and searching for web protocol prefixes such as \texttt{http://} or \texttt{https://}; messages containing these patterns are parsed to extract the actual hyperlinks from the conversation content.
+
+Investigators may use this function to identify URLs used to conceal malicious destinations, cloud storage links used to transmit unauthorised documents, or external communication services employed to facilitate illegal activities. The extracted URLs and metadata are exported into CSV and text-based reports.
+
+% ------ Subsection 4.7.8 -----------------------------------------------
+\subsection{Database Handler}
+
+The Database Handler module enforces protection and centralised database management across the toolkit. It ensures secure and strictly controlled database access across all analysis functions. Every analysis interaction with the WhatsApp evidence databases including Communication Profiling, Chat Reconstruction, Contact Mapping, Media Analysis, Deleted Message Detection, and URL Extraction is performed through this module. Centralised management provides integrity preservation throughout the analysis phase, prevents individual analysis modules from directly interacting with evidence databases in an uncontrolled manner, and assures uniform evidence protection procedures across the toolkit. This centralised evidence access approach is recommended in digital forensic research because it improves evidence consistency, auditability, and reliability during forensic analysis \citep{casey2011,carrier2005}.
+
+Before executing any query, the database handler performs validation on the evidence database. It first confirms that the database file exists, its size is non-zero, and it is not currently writable. If any of these checks fails, the query is rejected and the failure is recorded in the audit log. Only a validated query is forwarded to the SQLite engine for execution.
+
+The runtime schema detection and adaptive querying approach helps to address variations in WhatsApp database schemas across application versions. Studies have shown that WhatsApp frequently changes table names, column structures, metadata formats, and database relationships between releases, causing static forensic queries to fail when executed against unsupported versions \citep{anglano2014,lekhac2022book}. This approach enables the toolkit to adapt to multiple WhatsApp database versions without requiring manual modification of analysis queries, making it compatible with both older and modern WhatsApp releases.
+
+Every database access event, query execution, schema detection process, validation check, and analysis transaction is recorded in the toolkit's audit logs. The logs include timestamps, executed functions, target database references, analysis stages, execution outcomes, and the identity of the person who performed each action. This logging enforces accountability by creating a verifiable audit trail documenting how evidence was accessed and analysed during the investigation process. Audit logging is an essential component of forensic transparency and chain-of-custody preservation, helping investigators, auditors, and courts to reconstruct the sequence of forensic activities performed on the evidence \citep{casey2011}.
+
+% ------ Section 4.8 ---------------------------------------------------
+\section{Phase 6: Reporting Module}
+
+The Reporting Module constitutes the final operational phase of the toolkit and transforms all forensic findings into human-readable, professionally formatted, legally sound forensic reports. The module is implemented through \texttt{report\_generator.sh}, which gathers, organises, and processes the outputs generated by the toolkit.
+
+Python libraries are used to generate professionally formatted PDF reports from the structured analysis findings and to improve report readability, consistency, and document presentation. Python is used exclusively for report formatting and PDF generation, while all forensic analysis, evidence acquisition, and database interpretation are implemented by the Bash scripting modules. Separation between analysis processing and reporting components is recommended in forensic software engineering because it improves maintainability, modularity, reproducibility, and evidence reliability \citep{casey2011,carrier2005}.
+
+% ------ Subsection 4.8.1 -----------------------------------------------
+\subsection{Multi-Format Output}
+
+After the investigation process, investigators need to produce reports of the case. The reporting module provides three output formats, each serving a distinct purpose to support different stages of the forensic workflow.
+
+\textbf{HTML output} provides an interactive, browser-readable report suitable for investigator review during the active investigation phase. The HTML report includes navigable tabs for each analysis type communication profiling, chat reconstruction, contact mapping, media analysis, deleted messages, and URL extraction with summary statistics cards showing total message counts, contacts, and dates. Figure~\ref{fig:html_report} shows the HTML report open in a browser.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=\textwidth]{assets/images/fig4_15_html_report.png}
+%     \caption{Screenshot of the HTML forensic report open in a browser, showing the dark-themed dashboard with summary statistics cards and the navigable tab interface}
+%     \label{fig:html_report}
+% \end{figure}
+
+\textbf{PDF output} produces a print-ready, court-submissible document generated by Python libraries, with standardised page margins, page numbering, and document metadata to produce professionally formatted forensic documents. The PDF format provides immutable evidence documentation suitable for courtroom submission, legal disclosure, investigator handover, archival storage, and audit review. Figure~\ref{fig:pdf_report} shows a sample PDF report page.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=\textwidth]{assets/images/fig4_16_pdf_report.png}
+%     \caption{Screenshot of the PDF forensic report showing the cover page with case reference number, investigator name, warrant number, and the report authenticity SHA-256 hash}
+%     \label{fig:pdf_report}
+% \end{figure}
+
+\textbf{CSV output} is a tabular data export of each analysis result set, enabling import into other forensic tools, statistical analysis software, or evidence management systems. Investigators can import extracted communication records, contact mappings, URLs, or media artefacts into other analysis environments for advanced processing, intelligence correlation, visualisation, or timeline analysis. Figure~\ref{fig:csv_report} shows a sample CSV export open in a spreadsheet application.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=\textwidth]{assets/images/fig4_17_csv_report.png}
+%     \caption{Screenshot of a CSV report file open in a spreadsheet showing message records with columns for JID, direction, timestamp, and content}
+%     \label{fig:csv_report}
+% \end{figure}
+
+% ------ Subsection 4.8.2 -----------------------------------------------
+\subsection{Report Structure and Chain-of-Custody Integration}
+
+Each generated report is an evidence document that includes all information necessary for independent verification. The report includes the following elements:
+
+\begin{itemize}
+    \item \textbf{Case metadata:} Case identifier, case reference number, and legal authorisation document reference.
+    \item \textbf{Investigator details:} Name, identifier, and report generation timestamp.
+    \item \textbf{Evidence integrity section:} Master SHA-256 hash value, individual file hash values, number of files verified, and verification status.
+    \item \textbf{Analytical findings:} All analytical outputs formatted for human review.
+    \item \textbf{Chain of custody log:} A sequential record of every action performed on the evidence, including acquisition timestamp, integrity verification timestamp, analysis timestamp, and the identifying information of the investigator at each stage.
+    \item \textbf{Report authenticity hash:} A SHA-256 hash of the report PDF itself, enabling verification that the report has not been altered after generation.
+\end{itemize}
+
+Including chain-of-custody data ensures that the report remains legally defensible even when separated from the case management system. Any independent third party can verify the cryptographic hashes against the evidence files and confirm the unbroken chain of custody from acquisition to reporting.
+
+% ------ Subsection 4.8.3 -----------------------------------------------
+\subsection{Logging and Audit Trail}
+
+The toolkit implements automated logging across all modules. Every action is recorded with all necessary details to enable complete reconstruction of the investigative process by an independent examiner, satisfying ACPO Principle 3.
+
+Two log files are maintained:
+
+\begin{itemize}
+    \item \textbf{\texttt{activity.log} (Technical operation record):} Contains commands executed, paths accessed, query results, warnings, and timestamps. Each entry follows a standardised format capturing timestamp, log level, originating module, and descriptive message.
+
+    \item \textbf{\texttt{chain\_of\_custody.log} (Evidentiary handling record):} Captures the five Ws of evidence handling who (investigator identity), what (action performed), which (specific evidence item), when (timestamp), and outcome (success or failure status). This supports ACPO Principles 3 and 4 (accountability and reproducibility).
+\end{itemize}
+
+The chain-of-custody verification function in \texttt{wa-forensics.sh} confirms, at the conclusion of an investigation, that all six required events are present in the log: Evidence Acquired, Write Protection Applied, Hash Generated, Integrity Verified, Analysis Performed, and Report Generated. If any event is absent, the system reports the chain of custody as incomplete and flags the specific missing event for investigator attention before the report is finalised.
+
+Figure~\ref{fig:audit_log} shows an extract from the global audit log demonstrating the chain-of-custody log format, including the integrity failure event recorded during testing.
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=\textwidth]{assets/images/fig4_18_audit_log.png}
+%     \caption{Screenshot of the \texttt{global\_audit.log} file showing timestamped entries for case creation, acquisition, integrity verification failure, and case blocking --- corresponding to the CASE-20260501-103328 test run}
+%     \label{fig:audit_log}
+% \end{figure}
+
+% ------ Section 4.9 ---------------------------------------------------
+\section{Security and Forensic Integrity Mechanisms}
+
+The toolkit implements defence-in-depth for evidence protection through multiple, independently operating security layers. No single point of failure can compromise forensic integrity. These layers include:
+
+\begin{itemize}
+    \item \textbf{Database layer:} SQLite read-only mode (\texttt{sqlite3 -readonly} with \texttt{mode=ro} URI) prevents any SQL write operations (\texttt{INSERT}, \texttt{UPDATE}, \texttt{DELETE}, \texttt{DROP}).
+    \item \textbf{Permission layer:} Unix file permissions (\texttt{chmod 444}) prevent accidental modification by any user.
+    \item \textbf{Filesystem layer:} Immutable attribute (\texttt{chattr +i}) prevents modification even by root without explicit \texttt{chattr -i}.
+    \item \textbf{Procedural layer:} Exit code gating ensures the controller checks exit codes before advancing phases, preventing analysis of unverified or corrupted evidence.
+    \item \textbf{Input layer:} Whitelist validation using regex pattern matching prevents command injection and path traversal attacks.
+    \item \textbf{Execution layer:} Error trapping (\texttt{set -e} and \texttt{trap} handlers) prevents silent failures from going unnoticed and unlogged.
+\end{itemize}
+
+% ------ Section 4.10 ---------------------------------------------------
+\section{Implementation Challenges and Resolutions}
+
+Several implementation challenges were encountered during development. Each required a specific decision that influenced the final architecture of the toolkit.
+
+\textbf{WhatsApp Database Schema Evolution.} WhatsApp changes its database structure between releases, causing static tools to fail when applied to databases from unsupported versions \citep{anglano2014,fayyad2022}. This challenge was resolved through the runtime schema detection approach described in Section~4.7.1.
+
+\textbf{Root Access Variability.} Acquiring WhatsApp data from an Android device requires superuser (root) access to the \texttt{/data/data/com.whatsapp/} directory. The toolkit addresses this problem entirely by performing acquisition within a rooted Android Virtual Device (AVD), as explained in Section~4.4.
+
+\textbf{Emulator-Device WhatsApp Version Parity.} WhatsApp installed on the emulator may not match the version on the evidence device. This was resolved by a version verification step during Environment Setup that validates compatibility before account linking continues.
+
+% ------ Section 4.11 ---------------------------------------------------
+\section{Limitations}
+
+The current implementation has the following known limitations that investigators should be aware of before using this toolkit:
+
+\begin{itemize}
+    \item Deleted message recovery is not always possible; it depends on the presence of a SQLite WAL file containing pre-deletion data, which may not always be available after acquisition. The toolkit is only capable of detecting and flagging deleted records from the database. This limitation reflects the complexity of recovering deleted artefacts from WhatsApp databases and highlights the need for further comprehensive research in order to develop a recovery mechanism in future improvements of the toolkit.
+\end{itemize}
+
 % ═════════════════════════════════════════════════════════════════════════
 % REFERENCES
 % ═════════════════════════════════════════════════════════════════════════
