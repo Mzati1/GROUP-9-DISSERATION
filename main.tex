@@ -1,0 +1,696 @@
+\documentclass[12pt,a4paper]{report}
+
+% ════════════════════════════════════════════════════════════════════════
+% PACKAGES
+% ════════════════════════════════════════════════════════════════════════
+
+\usepackage{fontspec}
+\setmainfont[
+    Path        = assets/font/,
+    Extension   = .ttf,
+    UprightFont = *,                  % MaiandraGDRegular for normal text
+    BoldFont    = *,                  % falls back to same face if no Bold variant
+    ItalicFont  = *,                  % falls back to same face if no Italic variant
+]{MaiandraGDRegular}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{natbib}
+\usepackage{array}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage{nth}
+
+% ═════════════════════════════════════════════════════════════════════════
+% DOCUMENT BODY
+% ═════════════════════════════════════════════════════════════════════════
+
+\begin{document}
+
+% ────────────────────────────────────────────────────────────────────────
+% TITLE PAGE
+% ────────────────────────────────────────────────────────────────────────
+\begin{titlepage}
+    \centering
+    %\vspace*{0.3cm}
+
+    \includegraphics[width=6cm]{assets/images/must_logo.jpeg}\\[0.2cm]
+
+    {\Large\bfseries MALAWI UNIVERSITY OF SCIENCE AND TECHNOLOGY}\\[0.4cm]
+    {\large\bfseries MALAWI INSTITUTE OF TECHNOLOGY}\\[0.3cm]
+    \vspace{0.4cm}
+    {\large\bfseries DEPARTMENT OF COMPUTER SCIENCE }\\[0.3cm]
+    {\large\bfseries INFORMATION TECHNOLOGY}\\[0.3cm]
+    
+    {\large\bfseries RESEARCH PROJECT}\\[0.6cm]
+    {\large\bfseries Unified WhatsApp Forensic Toolkit for Android}\\[0.4cm]
+     {\Large\bfseries Group 3 \\[0.1cm]
+
+    \begin{tabular}{|p{8cm}|p{5cm}|}
+        \hline
+        \textbf{\large NAMES} & \textbf{\large REG NUMBERS} \\
+        \hline
+        \large Mzati Tembo (Group leader) & \large CSS-108-22 \\
+        \hline
+        \large Hope Abasi & \large CSS-013-22 \\
+        \hline
+        \large Moses Chazama & \large CSS-016-22 \\
+        \hline
+        \large Ruth Banda & \large CIS-001-20 \\
+        \hline
+        \large Jesse Mbekeyani & \large 3232011 \\
+        \hline
+        \large Upendo Mzumara & \large CSS-009-22 \\
+        \hline
+        \large George Kalua & \large CSS-022-22 \\
+        \hline
+        \large Madalitso Saulos & \large CSS-030-22 \\
+        \hline
+    \end{tabular}
+
+    \vspace{0.6cm}
+    {\normalsize Supervised by Dr. Kondwani Makanda}\\[0.4cm]
+
+    {\normalsize A dissertation submitted in partial fulfilment for the award of Bachelor of Science in}\\
+    Computer Systems and Security.}\\[0.8cm]
+
+    {\normalsize \nth{15} May, 2026}
+\end{titlepage}
+
+% ─────────────────────────────────────────────────────────────────────────────
+% DECLARATION
+% ─────────────────────────────────────────────────────────────────────────────
+\newpage
+\chapter*{DECLARATION}
+\addcontentsline{toc}{chapter}{Declaration}
+
+By signing below, we hereby affirm that this project is a result of our own work undertaken at the Malawi University of Science and Technology. We further confirm that it has not been submitted, in whole or in part, to any other institution for the purpose of obtaining a degree, diploma, certificate, or for prior publication. We also certify that all sources consulted in the preparation of this document have been duly acknowledged through proper citations and references, and that every effort has been made to uphold academic integrity and avoid plagiarism.
+
+\vspace{1.5cm}
+
+\noindent
+\begin{tabular}{p{5cm} p{5cm} p{5cm}}
+\textbf{Name} & & \\
+\\
+Mzati Tembo      & Signature: \underline{\hspace{3cm}} & Date: \underline{\hspace{2cm}} \\[1.2cm]
+ Hope Abasi       & Signature: \underline{\hspace{3cm}} & Date: \underline{\hspace{2cm}} \\[1.2cm]
+ Moses Chazama    & Signature: \underline{\hspace{3cm}} & Date: \underline{\hspace{2cm}} \\[1.2cm]
+ Ruth Banda       & Signature: \underline{\hspace{3cm}} & Date: \underline{\hspace{2cm}} \\[1.2cm]
+ Jesse Mbekeyani  & Signature: \underline{\hspace{3cm}} & Date: \underline{\hspace{2cm}} \\[1.2cm]
+ Upendo Mzumara   & Signature: \underline{\hspace{3cm}} & Date: \underline{\hspace{2cm}} \\[1.2cm]
+ George Kalua     & Signature: \underline{\hspace{3cm}} & Date: \underline{\hspace{2cm}} \\[1.2cm]
+ Madalitso Saulos & Signature: \underline{\hspace{3cm}} & Date: \underline{\hspace{2cm}} \\[1.2cm]
+\end{tabular}
+
+% ─────────────────────────────────────────────────────────────────────────────
+% SUPERVISOR APPROVAL
+% ─────────────────────────────────────────────────────────────────────────────
+\newpage
+\chapter*{SUPERVISOR APPROVAL}
+\addcontentsline{toc}{chapter}{Supervisor Approval}
+
+As the supervisor of this research project, I hereby confirm that I have thoroughly reviewed and evaluated the dissertation entitled \textit{``Unified WhatsApp Forensic Toolkit for Android''} carried out by a group of Computer Systems and Security students at the Malawi University of Science and Technology.
+
+Having assessed the work, I am satisfied that it meets the academic standards and requirements expected of a research dissertation. I therefore approve and recommend that it be submitted in partial fulfilment of the requirements for the award of a degree at this institution.
+
+\vspace{2cm}
+
+\noindent
+Signature: \underline{\hspace{5cm}} \hspace{2cm} Date: \underline{\hspace{3cm}}
+
+\vspace{1.5cm}
+
+\noindent
+\textbf{Dr. Kondwani Makanda}\\
+Department of Computer Science and Information Technology\\
+Malawi University of Science and Technology\\
+Malawi
+
+% ─────────────────────────────────────────────────────────────────────────────
+% ACKNOWLEDGEMENTS
+% ─────────────────────────────────────────────────────────────────────────────
+\newpage
+\chapter*{ACKNOWLEDGEMENTS}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+
+We begin by giving thanks to the Almighty God for granting us the strength, wisdom, and perseverance to bring this work to completion. Without His grace and provision, none of this would have been possible. We also extend our heartfelt gratitude to our parents and guardians, whose unwavering support, encouragement, and guidance have been a constant source of strength throughout this journey.
+
+Our sincere appreciation also goes to the Malawi University of Science and Technology for equipping us with knowledge and skills through the various modules offered, which have laid the foundation for this dissertation. We are particularly indebted to our supervisor, Dr.\ Kondwani Makanda, and our former supervisor, Mr.\ Kumbukani Lisilira, for their invaluable guidance, patience, and constructive feedback that greatly shaped the direction and quality of this work.
+
+In addition, we would like to acknowledge our friends, classmates, and colleagues who shared ideas, offered encouragement, and provided moral support along the way. The companionship made the challenges of this academic journey easier to overcome.
+
+Finally, we thank every individual who directly or indirectly contributed in one way or another to the success of this dissertation.
+
+% ─────────────────────────────────────────────────────────────────────────────
+% ABSTRACT
+% ─────────────────────────────────────────────────────────────────────────────
+\newpage
+\chapter*{ABSTRACT}
+\addcontentsline{toc}{chapter}{Abstract}
+
+Increasing incidents of WhatsApp-related crimes such as mobile money fraud, fake social media accounts, and cyberbullying highlight the urgent need for digital forensic tools with WhatsApp-specific capabilities to better support law enforcement efforts and improve the effectiveness of cybercrime investigations in Malawi. While existing tools are capable of performing forensics on WhatsApp, these tools have significant limitations, specifically in the Malawian context. 
+
+\textcolor{red}{Please provide a single paragraph highlighting those limitations.}
+
+The objective of this research is to develop an integrated WhatsApp Forensic Toolkit for Android that will improve investigators' ability to extract, analyse, and preserve WhatsApp-related evidence, ensuring its integrity and admissibility in legal proceedings, while filling the gap that existing tools present and strengthening global efforts against cybercrime. The toolkit integrates different open-source tools to create an environment that enables evidence acquisition, analysis, and report generation by identifying key WhatsApp artefacts.
+
+The development of the toolkit is primarily focused on data acquisition and analysis in such a way that data integrity is preserved and evidence is rendered admissible in a court of law.
+
+\textcolor{red}{Please provide the summary of the results that you have obtained. One paragraph summary is enough.}
+
+% ─────────────────────────────────────────────────────────────────────────────
+% TABLE OF CONTENTS
+% ─────────────────────────────────────────────────────────────────────────────
+\newpage
+\tableofcontents
+
+% ══════════════════════════════════════════════════════════════════════════════
+% CHAPTER 1: INTRODUCTION
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\chapter{INTRODUCTION}
+
+% ------ Section 1.1 -----------------------------------------------
+\section{Background}
+
+Digital forensics involves the scientific investigation of crimes committed through digital systems, focusing on the identification, acquisition, preservation, and analysis of digital evidence \citep{casey2014}. It plays a vital role in law enforcement and cybersecurity, ensuring that digital evidence is admissible in court. The growing complexity of cybercrimes such as fraud, impersonation, and unauthorised access has led to the development of specialised forensic tools that maintain the integrity of evidence during investigations \citep{karie2015}.
+
+Recent global reports highlight a surge in cybercrimes involving messaging platforms, particularly WhatsApp, which has become one of the most exploited channels for online fraud. In early 2024, over 43,000 cyber fraud cases in India were linked to WhatsApp, including phishing, impersonation, and investment scams \citep{ministryhomeaffairs2024}. Meta also reported removing 6.8 million scam accounts in 2025, many operated by organised cybercrime groups in Southeast Asia that use WhatsApp, Telegram, and TikTok to coordinate large scale fraud operations \citep{ikeda2025}. These networks often lure users into fake investment or cryptocurrency groups, revealing how WhatsApp has evolved into a global hub for cybercriminal collaboration and conspiracy.
+
+In Malawi, mobile-based scams and other cybercrimes are also on the rise \citep{nyirenda2024}. Although Section 83 of the Electronic Transactions and Cyber Security Act No.\ 33 of 2016 provides legal authority for the seizure and preservation of digital evidence, law enforcement agencies continue to face challenges in dealing with encrypted communication platforms like WhatsApp.
+
+WhatsApp is a widely used instant messaging and voice-over-IP application owned by Meta \cite{whatsapp2026}. It enables text messaging, voice and video calls, and the sharing of multimedia files and documents. A defining feature is its default end-to-end encryption, which ensures that only the communicating users can read messages, making third-party interception extremely difficult. Available on mobile and desktop platforms, WhatsApp requires a phone number for registration and supports group chats, broadcast lists, and status updates, which has made it both a popular communication tool and a frequent vector for cyber-enabled crimes.
+
+Existing forensic tools are often general-purpose and struggle with WhatsApp-specific challenges such as end-to-end encryption, data volatility, and evolving storage formats. These limitations reduce their reliability in evidence acquisition and analysis \citep{vinayagam2025}.
+
+
+
+% ------ Section 1.2 ----------------------------------------------------------
+\section{Problem Statement}
+
+Although Malawi has laws against cyber offences such as cyberstalking, fraud, impersonation, and data breaches, enforcing these laws and successfully prosecuting offenders remains a major challenge\cite{nyirenda2024, kajoloweka2022}. This difficulty is compounded by the growing number of cybercrime cases linked to WhatsApp, the country's most widely used communication platform \citep{chiputula2024}. Increasing incidents of mobile money fraud, fake social media accounts, and cyberbullying highlight the urgent need to enhance existing digital forensic tools with WhatsApp-specific capabilities to better support law enforcement efforts and improve the effectiveness of cybercrime investigations in Malawi \citep{balogh2025}. The main challenge is the limitations of existing digital forensic tools and methodologies, which affect the efficient investigation of WhatsApp-related cybercrime. These limitations manifest in several key areas \citep{oxygen2023, sutikno2024}.
+
+Firstly, there is no open-source forensic toolkit that offers a unified, automated framework for decrypting, parsing, and visualising WhatsApp data across its varied encrypted formats, such as crypt12, crypt14, and existing formats. Existing tools like WhatsApp Viewer, Whapa, and WhatsApp Key/Database Extractor perform isolated functions and lack interoperability, forcing investigators to manually chain disjointed processes, often requiring unreliable workarounds like application downgrading for key extraction, decryption, and analysis. This fragmented workflow is time-consuming, error-prone, and inconsistent across backup versions and container structures \citep{tusharanshu2023}.
+
+Secondly, conventional digital forensic acquisition techniques remain heavily reliant on full-device imaging, a process designed for broad data capture rather than focusing on application-level acquisition. This outdated approach is misaligned with modern investigative needs, where the primary evidence often resides within specific platforms such as WhatsApp. Full-device imaging generates excessive and largely irrelevant data, consumes significant storage and processing resources, and prolongs examination timelines. For investigators operating under limited technical capacity and time constraints, this results in unnecessary workload, slower case resolution, and a diminished ability to respond effectively to rapidly evolving cyber incidents \citep{aggarwal2019}.
+
+% ------ Section 1.3 --------------------------------------------------
+\section{Research Aim, Objectives and Questions}
+
+% ------ Subsection 1.3.1 -----------------------------------------------
+This subsection presents the research aim, objectives, and questions that guide the study. It begins with the aim of developing a unified WhatsApp Forensic Toolkit, which is followed by four specific objectives covering tool analysis, integration, validation, and performance evaluation. Finally, four corresponding research questions are posed to direct the investigation toward 
+addressing the identified forensic challenges.
+
+\subsection{Aim}
+
+The primary objective is to design, develop, and evaluate a unified WhatsApp Forensic Toolkit for Android that enhances and streamlines sparse acquisition, analysis, and reporting of digital evidence for WhatsApp-related cybercrime investigations in Malawi, ensuring admissibility in legal proceedings.
+
+% ------ Subsection 1.3.2 ---------------------------------------------
+\subsection{Objectives}
+
+To achieve this aim, the research pursues the following objectives:
+
+\begin{enumerate}
+    \item To analyse selected open-source WhatsApp forensic tools for possible integration into a unified toolkit that improves acquisition, analysis, and reporting of digital evidence.
+
+    \item To integrate the identified open-source WhatsApp forensic tool modules into a single portable environment that enables sparse evidence acquisition, triage, and reporting by identifying key digital artefacts such as databases, chats, related data (timestamps, media, messages, etc.), and profiles.
+
+    \item To validate the toolkit using simulated cybercrime cases to ensure data integrity, usability, and admissibility in legal proceedings.
+
+    \item To evaluate and compare the toolkit's effectiveness and performance against existing forensic tools in terms of speed, accuracy, and reliability where possible.
+\end{enumerate}
+
+% ------ Subsection 1.3.3 -----------------------------------------------
+\subsection{Research Questions}
+
+To address the challenges of WhatsApp forensics in Malawi, this research seeks to answer the following questions:
+
+\begin{enumerate}
+    \item Which open-source WhatsApp forensic tools provide the most effective forensic features for possible integration into a unified toolkit to improve the acquisition, analysis, and reporting of WhatsApp digital evidence?
+
+    \item How can the identified open-source WhatsApp forensic tools be effectively integrated into a unified and portable environment to streamline evidence acquisition and analysis for cybercrime investigations in Malawi?
+
+    \item How can the proposed WhatsApp forensic toolkit be validated using simulated scenarios to confirm that it maintains data integrity, usability, and admissibility in legal proceedings?
+
+    \item How does the performance of the Unified WhatsApp Forensic Toolkit compare with existing forensic tools in terms of speed, accuracy, and reliability?
+\end{enumerate}
+
+% ------ Section 1.4 -----------------------------------------------
+\section{Methodology}
+
+The methodology used for this research is constructive research methodology. It is well-suited for projects that aim to build a practical solution while contributing to theoretical knowledge. This approach ensures that artefact development is not only relevant to the real world but also offers insights that can inform academic and professional practice in respective industries. To strengthen adaptability, the methodology is complemented by Agile development practices, allowing for iterative design, feedback collection, and refinements at different stages collectively. The process of conducting the constructive research involved the following steps:
+
+% ------ Subsection 1.4.1 ------------------------------------------
+\subsection{Identifying a Practically Relevant Problem}
+
+The initial step is identifying a real-world challenge with both practical urgency and theoretical importance.
+
+% ------ Subsection 1.4.2 --------------------------------------------
+\subsection{Literature and Contextual Analysis}
+
+This involved a comprehensive review of existing digital forensics literature with a targeted focus on WhatsApp-specific artefacts, including message databases, contact databases, encryption keys, media files, call logs, user profile data, group metadata, and deleted messages and media remnants. It also involved a detailed evaluation of open-source tools across key forensic processes: acquisition, verification, decryption, parsing, and reporting. The review helped address challenges of database formats, file location variations, requirements of elevated privileges, and limited validation of tools. Additionally, a contextual analysis was conducted to align the findings with local investigative needs and technological constraints.
+
+% ------ Subsection 1.4.3 -------------------------------------------
+\subsection{Obtaining a Deep Understanding of the Problem}
+
+This phase involved a multi-faceted approach to gather insights through stakeholder consultations and technical assessments, which were critical in ensuring that the proposed WhatsApp forensic toolkit for Android directly addresses the specific limitations of existing digital forensic tools in Malawi.
+
+% ------ Section 1.5 ----------------------------------------------------
+\section{Structure of Dissertation}
+
+The remainder of this dissertation is structured as follows: Chapter 2 presents a comprehensive review of relevant literature. Chapter 3 outlines the system design of the proposed toolkit. Chapter 4 discusses the implementation and testing of the system, while Chapter 5 provides an evaluation of its performance. Finally, Chapter 6 concludes the dissertation and highlights key contributions, limitations, and directions for future work.
+
+% ------ Section 1.6 ---------------------------------------------------
+\section{Conclusion}
+
+This chapter introduced the background of digital forensics and highlighted that existing forensic tools are often general-purpose and struggle with WhatsApp specific challenges such as end-to-end encryption, data volatility, and evolving storage formats. It also outlined the problem statement, research aim, objectives, and questions that guide this study. The constructive research methodology was explained as the approach to be used in developing and testing the proposed toolkit. The next chapter reviews related literature and existing solutions to provide a foundation for the study.
+
+% ══════════════════════════════════════════════════════════════════════════════
+% CHAPTER 2: LITERATURE REVIEW
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\chapter{LITERATURE REVIEW}
+
+% ------ Section 2.1 ---------------------------------------------------
+\section{Introduction}
+
+This chapter presents a comprehensive review of existing relevant literature on digital forensics, WhatsApp forensic analysis, and mobile cybercrime investigations, with specific attention to the Malawian context. The review is organised into five major areas: the global perspective of WhatsApp forensicgs, the local Malawian perspective and legal framework, stakeholder challenges, identified research gaps, and the theoretical and technical foundations that inform the design of the proposed unified WhatsApp forensic toolkit. The chapter examines current forensic tools, techniques, and challenges associated with WhatsApp data acquisition and analysis.
+
+% ------ Section 2.2 --------------------------------------------
+\section{Global Perspective}
+
+WhatsApp has grown to become the world's most widely used instant messaging platform, with over two billion registered monthly active users as of 2022 \citep{nishchal2024}. Its ubiquity in personal, professional, and increasingly criminal communication has made it a central artefact in digital forensic investigations globally. Internationally, the development of WhatsApp forensic methods has evolved significantly over the past decade, progressing from basic manual extraction to sophisticated automated acquisition procedures capable of handling encrypted databases, multimedia evidence, and deleted artefact recovery. 
+\citep{anglano2014, prabowo2025}.
+
+Commercial forensic platforms have led this evolution. Tools such as Cellebrite UFED and Oxygen Forensic Detective offer comprehensive acquisition capabilities for WhatsApp artefacts, including message databases, encryption keys, media files, and cloud backups for both Android and iOS devices \citep{nishchal2024}. These platforms enable investigators to perform full-device imaging, logical extraction, and application-level targeted acquisition, each method offering different trade-offs between comprehensiveness, speed, and investigative relevance \citep{sutikno2024, oxygen2023}.
+
+However, scholars such as \citet{nishchal2024} noted that traditional whole-device imaging is often inefficient when only specific application data (e.g., chats, media, contacts) are required. The indiscriminate capture of all device data not only consumes excessive storage and processing resources but also prolongs examination timelines and introduces risks of data contamination. \citet{aggarwal2019} further argue that targeted, application-level data extraction tools represent a more appropriate and efficient paradigm for modern mobile investigations, particularly in resource-constrained environments. Consequently, specialised tools and methods that enable application-specific data extraction are generally preferable.
+
+\emph{The technical architecture of WhatsApp on Android stores communication artefacts across two primary SQLite database files: \texttt{msgstore.db}, which contains all message records, and \texttt{wa.db}, which holds contact identity information. The \texttt{msgstore.db} database contains tables including \texttt{message}, \texttt{chat}, \texttt{jid}, and \texttt{message\_media}, which together enable reconstruction of complete communication histories, participant identities, timestamps, and multimedia evidence trails. The \texttt{wa.db} database contains a \texttt{wa\_contacts} table that resolves internal WhatsApp identifiers ( Jabber IDs, also called JID's) to real-world phone numbers and contact names, forming a critical cross-reference for identity attribution during investigations.}
+
+Despite advancements in targeted extraction techniques, significant challenges persist globally. \citet{tusharanshu2023} identify the fragmentation of open-source forensic tools as a major barrier to effective WhatsApp investigations. Existing open source tools such as WhatsApp Viewer, Whapa, and WhatsApp Key/Database Extractor each address isolated aspects of the forensic workflow but lack interoperability \citep{tusharanshu2023}. Investigators must manually chain these disjointed processes, often resorting to unreliable workarounds such as application downgrading to extract encryption keys, resulting in workflows that are time consuming, error-prone, and inconsistent across backup versions and database schemas \citep{nishchal2024, tusharanshu2023}.
+
+The encryption architecture of WhatsApp further compounds forensic challenges. WhatsApp employs end-to-end encryption for all communications using the Signal Protocol, ensuring that messages cannot be intercepted in transit \citep{vijayan2018, nishchal2024}. On Android devices, database backups are stored in \texttt{.crypt12}, \texttt{.crypt14}, or \texttt{.crypt15} format, each requiring device-specific decryption keys stored in the application sandbox. Accessing these keys typically requires either root privileges on the device or the use of ADB (Android Debug Bridge) extraction methods, both of which require careful handling to preserve evidence integrity and maintain the forensic chain of custody \citep{kent2006}.
+
+The Write Ahead Log (WAL) mechanism of SQLite adds a further dimension to forensic recovery possibilities. \citet{nishchal2024} document that SQLite databases, including WhatsApp's \texttt{msgstore.db}, maintain a WAL file that holds uncommitted or recently committed database pages. Forensic examination of the WAL file before it is checkpointed into the main database can reveal deleted messages, revoked content, and ghost records that are no longer visible in the primary database \citep{nishchal2024}. This technique has become a standard component of advanced WhatsApp forensic analysis, particularly for investigations involving the deletion or revocation of incriminating messages.
+
+The cost and accessibility barriers of commercial forensic tools present a critical limitation for law enforcement agencies in lower-income contexts. Cellebrite UFED subscriptions can exceed USD~10,000 annually depending on licensing tiers and feature unlock credits, placing them beyond the reach of most African law enforcement agencies \citep{reddit2023}. This financial barrier has stimulated interest in open-source alternatives, though these require substantial technical expertise and consistent updates to remain effective as WhatsApp evolves its database schema and encryption formats.
+
+% ------ Section 2.3 ---------------------------------------------------
+\section{Local Perspective}
+
+Malawi's digital landscape is characterised by a paradox of high mobile phone penetration and low digital literacy, creating conditions that are increasingly exploited by cybercriminals. \citet{kajoloweka2022} document the country's vulnerability to cyber-enabled crimes in this environment, noting that citizens are disproportionately exposed to online threats through popular platforms such as WhatsApp, which dominates mobile communication across all demographic groups in the country. Users, particularly those with low digital literacy, often contribute unintentionally by deleting critical messages out of fear or shame, falling for phishing scams, or failing to use secure communication methods, resulting in the loss or corruption of key digital evidence.
+
+Criminals, on the other hand, exploit platform vulnerabilities including encryption gaps, fake account creation, message alteration or fabrication, and privacy features to conceal identities, thereby generating falsified evidence that undermines investigations \citep{vijayan2018}.
+
+The scale of WhatsApp related cybercrime in Malawi has risen significantly in recent years. \citet{chiputula2024} reports a surge in mobile money fraud, impersonation through fake accounts, cyberbullying, and sextortion cases, with WhatsApp identified as the primary medium in the majority of incidents. \citet{nyirenda2024} notes that although awareness of cybercrime is growing, only a small proportion of victims report incidents to law enforcement, partly due to insufficient confidence in investigators' capacity to handle digital evidence competently. This underreporting perpetuates a cycle in which the true scale of WhatsApp-related cybercrime remains statistically obscured.
+
+INTERPOL's 2025 report on cybercrime in Africa documents a sharp regional increase in WhatsApp facilitated crimes, including romance scams, investment fraud, and organised criminal coordination \citep{interpol2025}. Malawi is not immune to these regional trends, and the country's law enforcement agencies, most notably the Malawi Police Service, face compounded challenges in investigating such crimes. \citet{chimoyo2024} documents that the Malawi Police Service remains significantly under-equipped for digital forensic work, lacking comprehensive tools necessary for conducting thorough WhatsApp database investigations. The absence of a dedicated, locally appropriate forensic toolkit capable of lawfully accessing and analysing encrypted WhatsApp messages represents a critical operational gap.
+
+A particularly stark illustration of the consequences of this gap is found in the high profile The National Oil Company of Malawi (NOCMA) fuel procurement case, in which WhatsApp evidence presented against the accused was successfully challenged by the defence on grounds of insufficient forensic rigour \citep{makossah2021}. The court assigned little to no evidentiary weight to the WhatsApp chats and recordings submitted, highlighting how even substantial digital evidence can be rendered inadmissible when the methods of extraction, preservation, and authentication do not meet established forensic standards. This case underscored the operational and legal urgency of developing forensically sound WhatsApp investigation capabilities within Malawi.
+
+The legal framework for digital evidence in Malawi is provided primarily by the Electronic Transactions and Cyber Security Act No.\ 33 of 2016, which under Section 83 grants legal authority for the seizure and preservation of digital evidence. Sections 16(1) and 16(2) of the same Act establish that electronic records and messages are admissible in court, provided their integrity and authenticity can be demonstrated. However, \citet{rapozoND} notes that adherence to these standards is consistently hindered in practice by the absence of standardised forensic extraction tools, inadequate investigator training, and the lack of a clear national framework for digital evidence handling.
+
+Cases such as Majiga (2021), Majawa (2023), and Joshua (2024) demonstrate that Malawian courts have admitted WhatsApp evidence under appropriate conditions, providing precedent for its use in criminal proceedings. However, the prevailing practice among investigators relying on screenshots and manual phone inspections rather than forensically sound database extraction produces evidence that is easily contested on grounds of authenticity, tamper evidence, and chain of custody \cite{burgess2025}. \citet{guttman2022} emphasises that digital forensic procedures must generate tamper-evident, cryptographically verifiable records to survive judicial scrutiny, a standard that current Malawian investigative practice frequently fails to meet.
+
+The gendered dimensions of WhatsApp cybercrime in Malawi also warrant attention. \citet{interpol2025} notes that women, who represent a particularly active segment of WhatsApp users, are disproportionately targeted in sextortion, harassment, and impersonation cases. These crimes frequently involve the manipulation or fabrication of WhatsApp messages, placing further evidentiary demands on forensic tools to detect altered content and reconstruct authentic communication timelines. The toolkit proposed by this research must therefore address not only general forensic needs but also the specific evidence integrity challenges arising in gender-targeted cybercrime cases.
+
+% ------ Section 2.4 ----------------------------------------------------
+\section{Stakeholder Challenges}
+
+In this section, we revisit the stakeholder analysis and technical challenges outlined in the project proposal. The proposal identified three primary stakeholder groups: police and investigators, judiciary and courts, the private sector and The Malawi Revenue Authority ( MRA ).
+
+% ------ Subsection 2.4.1 -----------------------------------------------
+\subsection{Police and Investigators}
+
+The Malawi Police Service remains under-equipped and lacks comprehensive tools necessary for conducting thorough WhatsApp investigations \citep{chimoyo2024}. It faces significant limitations in handling encrypted WhatsApp clients' local databases due to the absence of a dedicated forensic toolkit capable of lawfully accessing encrypted messages. Furthermore, the seizure of journalists' devices and subsequent tampering which directly resulted in the compromise of private digital records, with messages being accessed and altered while the phones were in official custody demonstrates a critical failure in the application of core digital forensic principles, particularly in relation to WhatsApp data during investigations \citep{cpj2024}.
+
+% ------ Subsection 2.4.2 -----------------------------------------------
+\subsection{Judiciary and Courts}
+
+Authenticity and integrity issues arise as courts struggle to verify the authenticity of digital evidence, such as WhatsApp messages, when data is not properly extracted and preserved using forensic tools. In the absence of dedicated tools, it becomes difficult to establish a clear chain of custody, rendering the evidence vulnerable to being ruled inadmissible \citep{rapozoND}.
+
+% ------ Subsection 2.4.3 -----------------------------------------------
+\subsection{Private Sector}
+
+When a company seeks to investigate WhatsApp related policy violations involving its employees, it faces significant challenges due to the encrypted nature of the WhatsApp database and the deletion of suspects' messages.
+
+% ------ Subsection 2.4.4 -----------------------------------------------
+\subsection{Malawi Revenue Authority (MRA)}
+
+MRA maintains a specialised ICT security unit for forensic investigations. The MRA utilizes digital forensics to investigate financial crimes, tax evasion and illegal activities by gathering digital evidence from mobile devices, computers and other electronic storage systems. This calls for tools dedicated to investigate such cases effectively and efficiently.
+
+
+% ------ Section 2.5 ----------------------------------------------------
+\section{Identified Gaps}
+
+A systematic review of the existing literature reveals two principal gaps that directly motivate and define the scope of this research. These gaps represent both practical deficiencies in current forensic practice and theoretical limitations in the scholarly understanding of WhatsApp forensics in resource constrained contexts.
+
+% ------ Subsection 2.5.1 -----------------------------------------------------
+\subsection{Lack of an Integrated Toolkit Offering a Unified, Automated Framework for Handling WhatsApp Artefacts}
+
+Investigators who conduct WhatsApp digital forensics analysis face various challenges due to the ever-changing architecture of the WhatsApp application, which includes the following.
+
+% ------ Subsubsection 2.5.1.1 ------------------------------------------
+\subsubsection{Fragmented Open-Source Forensic Tooling}
+
+The most significant structural deficiency in current WhatsApp forensic practice is the fragmentation of available open source tools. WhatsApp Viewer, Whapa, and WhatsApp Key/Database Extractor each address isolated components of the forensic workflow but do not form a coherent, interoperable pipeline. \citet{tusharanshu2023} document how this fragmentation forces investigators to manually orchestrate multiple tools, each with its own input/output format, dependencies, and failure modes. This manual chaining introduces unacceptable risks of evidence contamination, procedural error, and reproducibility failures all of which can undermine the admissibility of extracted evidence in court. No existing open source toolkit provides a unified, automated framework that spans the complete WhatsApp forensic workflow from acquisition through decryption, parsing, and court ready reporting.
+
+% ------ Subsubsection 2.5.1.2 ------------------------------------------
+\subsubsection{Evolving Encryption Formats and Schema Variability}
+
+WhatsApp has introduced successive backup encryption formats crypt12, crypt14, and crypt15 with meaningful differences between WhatsApp Messenger and WhatsApp Business. \citet{nishchal2024} notes that existing forensic tools frequently support only a subset of these formats, requiring investigators to use manual workarounds such as application downgrading to access evidence on devices running newer WhatsApp versions. \emph{Additionally, the internal database schema of \texttt{msgstore.db} has evolved across WhatsApp updates, introducing new tables and column structures most notably the addition of the @lid Business identifier system that have not been comprehensively documented or supported by existing forensic tools. This schema variability means that SQL queries and parsing scripts developed for one WhatsApp version may produce incomplete or erroneous results against a different version.}
+
+% ------ Subsubsection 2.5.1.3 ------------------------------------------
+\subsubsection{Elevated Privilege Requirements and Evidence Integrity}
+
+Accessing WhatsApp's encrypted database files and device-specific decryption keys typically requires either root privileges on the Android device or full logical acquisition through ADB. Conventional full-device imaging approaches capture all device data indiscriminately, generating volumes of forensically irrelevant information and consuming significant storage and processing resources. \citet{aggarwal2019} argue that this broad approach is misaligned with modern investigative needs, where investigators require the ability to perform sparse, targeted acquisition focused on specific application artefacts. Furthermore, existing key extraction methods that rely on application downgrading directly interact with the target device's data and carry a risk of altering the very evidence being sought, potentially violating chain of custody requirements.
+
+% ------ Subsection 2.5.2 -----------------------------------------------
+\subsection{Lack of a WhatsApp Application-Level Evidence Acquisition Tool}
+
+Investigators in Malawi face significant challenges in acquiring evidence directly from WhatsApp due to the absence of a specialised application-level tool \citep{chimoyo2024, mtegha2024}.
+
+% ------ Subsubsection 2.5.2.1 -----------------------------------------
+\subsubsection{Manual and Error-Prone Evidence Collection}
+
+In cases where access to specialised tools is absent, investigators resort to screenshots, message exports, or multiple partial tools. This increases the risk of evidence loss, data corruption, or inadmissibility in court, since these sources can be altered or modified \citep{nishchal2024}.
+
+% ------ Subsubsection 2.5.2.2 ------------------------------------------
+\subsubsection{Dependence on General Forensic Tools}
+
+Most investigators rely largely on general mobile forensic tools, such as Cellebrite, Oxygen, and MOBILedit. These tools are designed for full-device extraction rather than WhatsApp-specific evidence, and therefore cannot access encrypted WhatsApp databases, call logs, media, or metadata in a reliable way, which leaves critical WhatsApp evidence incomplete or inaccessible \citep{alissa2019}. This dependence significantly undermines the efficiency, accuracy, and legal defensibility of forensic investigations. This highlights the urgent need for a dedicated application-level acquisition tool that can securely and systematically extract WhatsApp artefacts in a form suitable for analysis and courtroom presentation.
+
+% ------ Section 2.6 ---------------------------------------------------
+\section{Conclusion}
+
+This chapter examined existing relevant literature on digital forensics, WhatsApp forensic analysis, and mobile cybercrime investigations, with specific attention to the Malawian context. The review identified critical gaps in current forensic tooling, particularly the lack of a unified, automated open-source framework for WhatsApp evidence acquisition, decryption, and analysis. In the next chapter, the system design and architecture of the proposed unified WhatsApp forensic toolkit are presented to address the gaps identified in this review.
+
+% ══════════════════════════════════════════════════════════════════════════════
+% CHAPTER 3: SYSTEM DESIGN
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\chapter{SYSTEM DESIGN}
+
+% ------ Section 3.1 ---------------------------------------------------
+\section{Introduction}
+
+This chapter outlines how the WhatsApp digital forensic toolkit was designed to come up with a working forensic toolkit that can be used in forensics. The system adopts a modular forensic architecture designed to support acquisition, analysis and reporting of WhatsApp artefacts. Each module performs a specific function while maintaining integrity and legal compliance. The system integrates multiple open-source tools to come up with a unified toolkit running on a portable Ubuntu OS.
+
+% ------ Section 3.2 ---------------------------------------------------
+\section{Target User Categories}
+
+The unified forensic toolkit has been designed to serve three user categories: law enforcement investigators as primary users, judiciary and courts as secondary users, and private sectors as tertiary users. These categories are strongly involved in the digital forensics process.
+
+\begin{enumerate}
+    \item \textbf{Law enforcement investigators:} These are police and investigators who are responsible for working on mobile money fraud, impersonation, cyberbullying, sextortion and other cybercrimes. The toolkit is designed to enable law enforcers to perform data acquisition from the suspect's device, conduct data analysis and generate reports that can be used in a court of law. The toolkit also helps to maintain chain of custody and the integrity of the evidence.
+
+    \item \textbf{Judiciary and courts:} These are legal and judicial personnel needing to verify the integrity of evidence in legal proceedings. The toolkit is designed with integrity checks including chain of custody that helps with admissibility of evidence in a court of law. Judicial personnel are able to trace whether the evidence has been tampered with or not.
+
+    \item \textbf{Private sector:} These are tertiary users such as corporate security teams investigating employee policy violations, IT auditors conducting internal investigations, and forensic service providers offering WhatsApp evidence extraction services. The toolkit is designed to allow data acquisition, analysis and report generation for WhatsApp artefacts.
+\end{enumerate}
+
+% ------ Subsection 3.2.1 ----------------------------------------------
+\subsection{System Requirements Overview}
+
+The goal was to develop a WhatsApp forensic toolkit that allows digital forensic experts to conduct WhatsApp forensic investigations by using a tool that is tailored for WhatsApp-based crimes, eliminating the need to adapt general-purpose forensic toolkits. The requirements of the system are grouped into two categories: functional requirements and non-functional requirements.
+
+% ------ Subsubsection 3.2.1.1 -----------------------------------------
+\subsubsection{Functional Requirements}
+
+Functional requirements highlight the key capabilities of the WhatsApp forensic toolkit that enable it to achieve user expectations.
+
+\begin{enumerate}
+    \item \textbf{Case management}
+
+    The system shall allow investigators to create a new workspace that includes:
+    \begin{itemize}
+        \item Auto-generated unique case IDs.
+        \item Registration of the investigator's credentials.
+        \item Capture and storage of an authorised warrant number.
+        \item Automatic creation of a full directory scaffolding (nested folders for evidence, logs, cryptographic hashes and reports).
+    \end{itemize}
+
+    \item \textbf{Evidence acquisition}
+    \begin{itemize}
+        \item The system should support sparse acquisition of WhatsApp databases (\texttt{msgstore.db.crypt*}), media files, contact databases and call logs.
+        \item The system must provide acquisition methods including ADB (Android Debug Bridge).
+        \item The system should preserve original evidence by operating in a read-only mode using write-blocking capabilities \citep{kent2006, aggarwal2019}.
+    \end{itemize}
+
+    \item \textbf{Integrity verification}
+    \begin{itemize}
+        \item At the beginning of the analysis session, the system shall recalculate cryptographic hashes of all the evidence acquired and compare them against hashes generated at acquisition. The system shall automatically terminate analysis if the hashes do not match, thereby preventing analysis of potentially compromised evidence \citep{guttman2022}.
+    \end{itemize}
+
+    \item \textbf{Forensic analysis}
+    \begin{itemize}
+        \item The system should parse decrypted databases to extract and display:
+        \begin{itemize}
+            \item Chat messages with timestamps.
+            \item Contact information and phone numbers.
+            \item Call logs.
+            \item Media file references.
+            \item Group metadata.
+            \item Profile information (display messages, status messages, profile references).
+        \end{itemize}
+        \item The system must provide timeline visualisation of chat activities to assist investigators in understanding event sequence.
+        \item The system should allow filtering of evidence by date range, participant or message type.
+    \end{itemize}
+
+    \item \textbf{Report generation}
+
+    Investigators can generate reports in several formats including Google Material Design, HTML, CSV reports, plain-text transcripts and PDF documents. Regardless of the report format used, the toolkit automatically generates chain of custody metadata and investigator credentials directly in each report.
+
+    \item \textbf{Audit logging}
+
+    All investigator actions are recorded in three separate logs: an activity log specific to each case, a dedicated chain of custody log, and a global audit log that tracks cross-case activity with full session information.
+\end{enumerate}
+
+% ------ Subsubsection 3.2.1.2 -----------------------------------------
+\subsubsection{Non-Functional Requirements}
+
+\begin{enumerate}
+    \item \textbf{Performance}
+    \begin{itemize}
+        \item The toolkit must perform operations within a timeframe suitable for real-world investigators. This is to ensure investigators are not delayed by slow processing during active cases.
+    \end{itemize}
+
+    \item \textbf{Usability}
+    \begin{itemize}
+        \item The toolkit must be accessible to investigators of different levels of digital forensics expertise.
+        \item The toolkit must include a quick-start mode that executes the complete forensic pipeline with minimal user input.
+    \end{itemize}
+
+    \item \textbf{Security and integrity}
+    \begin{itemize}
+        \item The toolkit must ensure that extracted evidence is not tampered with, is verifiable, and is legally admissible throughout the entire forensic workflow, as required by the Electronic Transactions and Cyber Security Act (2016) of Malawi and ACPO Good Practice Guidelines \citep{guttman2022}.
+        \item All required evidence files (databases, media, configuration files) must be automatically set to read-only mode (\texttt{chmod 444}) immediately after acquisition.
+    \end{itemize}
+
+    \item \textbf{Portability}
+    \begin{itemize}
+        \item The toolkit should function completely offline. There should be no need for an internet connection during acquisition or reporting.
+        \item The toolkit should work on Linux distributions that have Bash 5.x, SQLite3, and standard GNU capabilities.
+        \item The toolkit must support bootable forensic environments for investigators operating in the field.
+    \end{itemize}
+
+    \item \textbf{Resource efficiency}
+    \begin{itemize}
+        \item The toolkit should not consume CPU resources when idle.
+        \item The toolkit should not require any network resources.
+        \item The toolkit should operate on limited hardware, considering that investigative environments in Malawi may lack high-end workstations \citep{chimoyo2024}.
+    \end{itemize}
+
+    \item \textbf{Legal and compliance}
+    \begin{itemize}
+        \item The toolkit must comply with all four ACPO Good Practice Guidelines:
+        \begin{itemize}
+            \item Principle 1 (No alteration): Enforced through \texttt{chmod 444} and \texttt{sqlite3} read-only mode.
+            \item Principle 2 (Competent handling): Enforced through investigator credentialing before any operations.
+            \item Principle 3 (Audit trail): Enforced through \texttt{activity.log}, \texttt{chain\_of\_custody.log} and \texttt{global\_audit.log}.
+            \item Principle 4 (Accountability): Enforced through session ID and investigator attribution.
+        \end{itemize}
+        \item The toolkit should maintain a global audit log that records actions across all cases.
+        \item All log entries should be timestamped, append-only and non-editable through normal toolkit operations.
+    \end{itemize}
+\end{enumerate}
+
+% ------ Section 3.3 ---------------------------------------------------
+\section{General System Design}
+
+This section presents the essential general system designs of the WhatsApp forensic toolkit that transform theoretical requirements into a concrete plan, ensuring a clear path to successful implementation of the functional and non-functional requirements. The following subsections explain the architecture design, which defines the high-level layers (acquisition, analysis and reporting), the software design, which explains the behavioural logic of each module, and the program design, which details the database structure, schema and algorithms necessary for implementation.
+
+% ------ Subsection 3.3.1 ----------------------------------------------
+\subsection{Software Architecture Design}
+
+This subsection defines the architecture design of the forensic toolkit, establishing the structural organisation of components, their interactions and deployment considerations. The toolkit is designed to prioritise portability, integrity and ease of use for investigators operating in resource constrained environments such as Malawi \citep{chimoyo2024, mtegha2024}. The toolkit follows a modular shell library architecture, meaning work is divided among small, independent modules where each handles one specific task, with a single entry-point orchestrator that controls the workflow of specialised library modules by invoking them in a defined order.
+
+% ------ Subsection 3.3.1 - Module Descriptions ----------------
+The toolkit consists of seven modules, each performing a distinct forensic function within the unified pipeline.
+
+\begin{enumerate}
+    \item \textbf{Wa\_forensic module:} This is the orchestrator which, in the entry point, starts the toolkit and loads all four modules so they are ready for use and calls the right module at the right time. The orchestrator is also responsible for error handling and user interaction by displaying simple menus which prompt the investigator to enter information such as case number and warrant reference.
+
+    \item \textbf{Case\_manager module:} This module is responsible for creating a workspace for a case. When a case is created, it generates an auto-ID which is unique for each case. It also loads any existing cases, which is important when an investigator is resuming work on an investigation that was restarted earlier, and lists all available cases displaying key information such as case ID, title, creation date, current state, and name of the assigned investigator. The \texttt{case\_manager} also saves case states at different stages of investigation, recording whether an investigation is new, in acquisition, analysis, reporting, or archive. It also deletes cases where necessary and displays detailed case information.
+
+    \item \textbf{Data\_acquisition module:} This module handles extraction of WhatsApp data from an Android emulator using Android Debug Bridge (ADB). ADB establishes the connection and access between the forensic workstation and the emulator. Once connected, the module initiates a root shell, which grants unrestricted access to protected directories. The module issues copy commands to move database files from the protected area to the emulator's shared storage, which is accessible to the host computer. Throughout the acquisition process, the module simultaneously computes SHA-256 and MD5 hashes of each file being transferred and applies write protection to render the files read-only.
+
+    \item \textbf{Integrity\_validation module:} This module verifies that all acquired evidence remains unaltered before any analysis proceeds. It checks that every file within the evidence directory has its read-only attribute set correctly. The module performs rehashing to ensure that no artefact has been corrupted or tampered with during storage by implementing a strict cryptographic verification workflow. If a single file mismatches any computed hash, the module issues a blocking exception that prevents the forensic toolkit from proceeding to the analysis phase.
+
+    \item \textbf{Db\_handler module:} This module is responsible for all operations involving the WhatsApp database. Firstly, it validates the database to ensure that it is genuinely a WhatsApp database and has not been tampered with. Secondly, the module acquires the database by connecting to the Android device using ADB and navigating to the WhatsApp sandbox where relevant artefacts are stored. Thirdly, it auto-discovers the database by detecting which version of the encrypted database is present on the device and identifies the appropriate decryption tools for that format, without requiring manual input from the investigator. Once decryption is complete, the module exports all tables in their raw formats. Lastly, the module supports custom SQL commands, allowing experienced investigators to execute specific queries against the decrypted databases.
+
+    \item \textbf{Chat\_analyser module:} This module is responsible for analysing the decrypted WhatsApp database and extracting meaningful information from it. WhatsApp stores all messages in a table typically known as \texttt{messages}. The module detects and automatically locates this table and extracts all messages along with their associated fields. The module also detects the chat table, which contains metadata about each conversation thread, and the JID table, which stores a unique identifier for each contact and group. The module performs Q1 through Q8 forensic analysis queries eight predefined queries that extract the most valuable evidence in WhatsApp cybercrime investigations; for example, Q1 extracts messages containing money-related keywords and Q2 extracts all deleted messages. The module generates statistics that provide a quick overview of the WhatsApp dataset and produces a per-chat HTML deep-dive report.
+
+    \item \textbf{Report\_generator module:} This module is responsible for producing all final reports from the forensic investigation. It generates an HTML report, which is a web-based report viewable in any browser and is useful for internal reviews and supervision briefings. The module produces PDF reports, which are generally used for court submission. It also produces CSV reports in a spreadsheet-friendly format, useful for investigators who want to perform additional analysis using spreadsheet software. Additionally, the module generates plain-text transcripts, which are more useful for quick review on any device. Lastly, the module can generate all report formats simultaneously instead of generating each separately, saving time and ensuring consistency across all reports.
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=\textwidth]{assets/images/software_architecture.png}
+    \caption{Software Architecture Design for the System}
+    \label{fig:software_architecture}
+\end{figure}
+
+% ------ Subsection 3.3.2 -----------------------------------------------
+\subsection{Program Design}
+
+The Unified WhatsApp Forensic Toolkit was designed as a modular, component-based solution consisting of an orchestrator entry point, four library modules, and two standalone scripts. Together, these components form a cohesive forensic investigation workflow, from case creation through evidence acquisition to report generation.
+
+% ------ Subsubsection 3.3.2.1 ------------------------------------------
+\subsubsection{Orchestrator Component}
+
+This component was designed to serve as the main entry point and central controller for the entire forensic toolkit. It initialises the environment, manages the user interface, and coordinates the other modules. The functions of this component are as follows.
+
+\begin{itemize}
+    \item \textbf{Session Initialisation:} Generates a \texttt{session\_ID} that links all actions performed during an investigation session.
+    \item \textbf{Dependency Checking:} Verifies that all required tools are present, including \texttt{sqlite3}, \texttt{sha256sum}, \texttt{md5sum}, \texttt{adb}, and Python 3.
+    \item \textbf{Menu Management:} Manages the interactive menu loop using \texttt{validate\_menu\_input()} and input validation to prevent injection attacks.
+    \item \textbf{Workflow Orchestration:} Coordinates the complete forensic workflow in a strict, defined order.
+    \item \textbf{Logging:} Provides the universal function \texttt{log\_action()} that appends to both the per-case logs and the global audit log simultaneously.
+\end{itemize}
+
+% ------ Subsubsection 3.3.2.2 ------------------------------------------
+\subsubsection{Case Management Component}
+
+This component was designed to manage the complete lifecycle of forensic cases from creation through loading, saving, and deletion. It ensures that each case is properly isolated and that evidence integrity is maintained. This component is divided into four modules: the case creation module, the case loading module, the case deletion module, and the state persistence module.
+
+\textbf{Case Creation Module.} This module handles the creation of a new forensic case. Its inputs include investigator name, badge ID, organisation, warrant number, suspect phone number, and device details. The module validates all user inputs such as phone number format and required fields and auto-generates a unique Case-ID to ensure each case is properly isolated. It then creates the complete directory structure. The outputs of this module are a case directory with an ACPO compliance record, and empty subdirectories for databases, reports, logs, and evidence.
+
+\textbf{Case Loading Module.} This module handles resuming work on an existing case. Its input is the selection of an existing case from a list. The module displays all cases with investigator names, restores the session state from the \texttt{.case\_state} file, and exports case variables to the environment. The output is a restored case environment ready for analysis.
+
+\textbf{Case Deletion Module.} This module handles the removal of a case. Its inputs are the case selection and a confirmation prompt. The module requires explicit confirmation before removing the entire case directory and all associated evidence. The output is a confirmation message and an updated case list.
+
+\textbf{State Persistence Module.} This module handles saving the current investigation state. Its input is the set of current case variables. The module writes all case variables to a \texttt{.case\_state} file as \texttt{export VAR=value} lines. The output is a \texttt{.case\_state} file that can be sourced to restore the session at any time.
+
+% ------ Subsubsection 3.3.2.3 ------------------------------------------
+\subsubsection{Evidence Acquisition Component}
+
+This is a standalone component that handles the physical extraction of WhatsApp data from a rooted Android emulator through ADB (Android Debug Bridge). It comprises four modules: the ADB connection module, the data acquisition module, the write protection module, and the hash generation module.
+
+\textbf{ADB Connection Module.} This module establishes and validates the connection to the Android emulator. Its input is a connected, rooted Android emulator. The process validates the ADB connection using \texttt{adb wait-for-device}, checks boot completion via \texttt{getprop sys.boot\_completed}, and verifies root access with \texttt{su -c id}. The output is a confirmed ADB connection ready for acquisition.
+
+\textbf{Data Acquisition Module.} This module handles the extraction of databases and media files. Its input is the target case directory path. The process copies WhatsApp data using \texttt{su -c 'cp -r /data/data/com.whatsapp/ /sdcard/'} and pulls the copied data using \texttt{adb pull}. It also pulls media from \texttt{/sdcard/Android/media/com.whatsapp/}. The outputs are acquired databases and media files stored in the case folder.
+
+\textbf{Write Protection Module.} This module ensures that acquired evidence cannot be tampered with. Its input is the acquired evidence folder. The process applies \texttt{chmod -R -w} to all evidence directories immediately after the pull operation. The output is a set of read-only evidence files with permissions set to \texttt{chmod 444}.
+
+\textbf{Hash Generation Module.} This module produces cryptographic records of the acquired evidence. Its inputs are the acquired evidence directories. The module computes SHA-256 hashes using \texttt{tar -c DIR | sha256sum} and writes the results to \texttt{hashes.txt} with a timestamp. The output is a cryptographic hash record of the evidence state at the time of acquisition.
+
+% ------ Subsubsection 3.3.2.4 ------------------------------------------
+\subsubsection{Integrity Verification Component}
+
+This standalone component provides cryptographic proof that evidence acquired has not been modified or tampered with between acquisition and analysis. It serves to prove that evidence is verifiable and that integrity has been maintained. It is broken down into four modules: the write protection verification module, the hash re-computation module, the tamper detection module, and the failure handling module.
+
+\textbf{Write Protection Verification Module.} This module checks that the read-only mode of evidence files and directories has been maintained. Its input is the case folder path. The module checks that evidence directories hold \texttt{chmod 444} (read-only) permissions using the \texttt{stat} command. The output is a confirmation of write protection, or an error message if any file is found to be writeable.
+
+\textbf{Hash Re-computation Module.} This module recomputes hash values to verify that evidence files remain identical to the originals acquired. Its inputs are the original hashes stored in \texttt{hashes.txt}. The module recomputes the SHA-256 hash of the evidence directories using the same \texttt{tar | sha256sum} method. The output is a hash comparison result, indicating either a match or a mismatch.
+
+\textbf{Tamper Detection Module.} This module flags evidence that has been tampered with, based on the hash comparison result. Its input is the hash comparison result. If the hashes match, the module writes an \texttt{.integrity\_verified} flag file. If a mismatch is detected, it invokes the \texttt{handle\_failure()} function. The output is either a success state (\texttt{.integrity\_verified} flag set) or a failure state (analysis is blocked).
+
+\textbf{Failure Handling Module.} This module defines the actions to be taken when an integrity check fails. Its inputs are the details of the failed integrity check. The module displays a forensic warning, logs the failure, and returns exit code 1. The outputs are a blocked analysis state and an option to re-acquire evidence.
+
+% ------ Subsubsection 3.3.2.5 ------------------------------------------
+\subsubsection{Database Handler Component}
+
+This component was designed to manage all interactions with WhatsApp SQLite databases in a forensically sound, read-only manner. It is divided into five subsystems: the database validation module, the database acquisition module, the query execution module, the custom SQL module, and the schema export module.
+
+\textbf{Database Validation Module.} This module verifies that the required databases exist, are encrypted, and have not been modified. Its input is a database file path. The process checks for file existence and non-zero size, verifies SQLite magic bytes, and checks for a \texttt{.crypt*} extension indicating encryption. The output is a validation result: valid, invalid, corrupted, or encrypted.
+
+\textbf{Database Acquisition Module.} This module copies databases into the case folder in a forensically sound manner. Its inputs are the source database path and the destination path. The process copies the database to the case folder, applies \texttt{chmod 444}, and computes both SHA-256 and MD5 hashes. The output is a read-only database copy accompanied by a hash record.
+
+\textbf{Query Execution Module.} This module executes predefined SQL queries against the decrypted databases. Its inputs are an SQL query string and an output format specifier. The module always uses the \texttt{sqlite3 -readonly} flag, executes the query, and captures the output and row count. The outputs are query results in the specified format and a row count for audit logging.
+
+\textbf{Custom SQL Module.} This module allows experienced investigators to run their own SQL queries. Its input is a custom SQL query from the investigator. The process validates that the query begins with \texttt{SELECT} and then executes it with the read-only flag. Outputs include query results for valid \texttt{SELECT} statements, or a rejection message for any non-\texttt{SELECT} statements.
+
+\textbf{Schema Export Module.} This module extracts the database schema for forensic documentation. Its input is a database name. The process executes the \texttt{.schema} command to retrieve the full database structure. The output is an SQL schema suitable for inclusion in forensic reports.
+
+% ------ Subsubsection 3.3.2.6 ------------------------------------------
+\subsubsection{Forensic Analysis Engine}
+
+This is a standalone component that is the largest and most complex, containing the schema detection subsystem and eight forensic analysis modules (Q1--Q8).
+
+\textbf{Schema Detection Subsystem.} This subsystem establishes connections within the databases. Its input is a database connection. The process inspects the actual database tables using \texttt{PRAGMA table\_info} and detects table names (e.g., \texttt{message} vs \texttt{messages}, \texttt{chat} vs \texttt{chats}, media table variants, and timestamp column variants). The output is detected schema information that is used to dynamically construct all subsequent queries.
+
+\textbf{Activity Profiling Module (Q1).} This module categorises the message database based on timestamps. Its input is the message database. The process groups messages by hour-of-day and day-of-week using \texttt{strftime()} on Unix epoch timestamps. The output is a communication frequency heatmap identifying peak activity windows.
+
+\textbf{Chat Reconstruction Module (Q2).} This module attempts to understand events by recreating conversation threads. Its inputs include the message database and a selected contact. The process joins the message table with the JID table to resolve anonymised identifiers to readable names and orders results by timestamp. The output is a complete conversation thread with timestamps and participant identification.
+
+\textbf{Contact Mapping Module (Q3).} This module connects chats and messages to the corresponding entries in the contact database. Its inputs include \texttt{msgstore.db} and \texttt{wa.db}. The process cross-references JIDs from the messages database with the contacts database. The output is a mapping of JIDs to display names and stored contact numbers.
+
+\textbf{Media Reconstruction Module (Q4).} This module was designed to understand the sequence of events using media found within chats. Its input is the message database. The process queries the \texttt{message\_media} or \texttt{media} tables. The output is a catalogue of shared files with type, filename, size, MIME type, and associated timestamps.
+
+\textbf{Deleted Message Detection Module (Q5).} This module detects and flags any deleted messages within the chats. Its input is the message database. The process searches for messages with a \texttt{status = -1} or \texttt{deleted = 1} flag, or orphaned rows where the parent chat no longer exists. The output is a set of soft-deleted records with their original timestamps and content.
+
+\textbf{URL Extraction Module (Q6).} This module extracts all URLs that were shared within the chats. Its input is the message database. The process queries the \texttt{message\_link} table or applies the regular expression pattern \texttt{http[s]?://[\textasciicircum\textbackslash s]+} to message text. The output is a list of all extracted hyperlinks with their associated message timestamps.
+
+\textbf{Master Timeline Module (Q7).} This module constructs a single, complete chronological timeline of all activities from the beginning to the end of the dataset. Its input is the message database. The process performs a \texttt{UNION ALL} across messages, media events, and link events. The output is a unified chronological narrative of all digital activity.
+
+\textbf{WAL Recovery Module (Q8).} This module attempts to retrieve uncommitted records from the Write-Ahead Log. Its input is the \texttt{msgstore.db-wal} file, if present. The process reads the WAL file and attempts to extract uncommitted records. The output is a set of messages recovered from WAL frames not yet checkpointed to the main database.
+
+% ------ Subsubsection 3.3.2.7 ------------------------------------------
+\subsubsection{Report Generator Component}
+
+This component produces court-admissible outputs in multiple formats, embedding all required forensic metadata. It is broken down into five modules: the HTML report module, the PDF report module, the CSV export module, the plain text module, and the per-chat deep dive module.
+
+\textbf{HTML Report Module.} Its inputs include analysis results, case metadata, and evidence hashes. The module generates a Google Material Design HTML report with embedded chain-of-custody metadata, investigator credentials, and evidence hashes. All styles are inlined, meaning there are no external dependencies. The output is an HTML report saved to \texttt{reports/html/forensic\_report.html}.
+
+\textbf{PDF Report Module.} Its input is the generated HTML report file. The module converts the HTML report to PDF using \texttt{wkhtmltopdf}. The output is a PDF report saved to \texttt{reports/pdf/forensic\_report.pdf}.
+
+\textbf{CSV Export Module.} Its input is the raw query results. The module exports query output as comma-separated values. The output is a set of CSV files saved to \texttt{reports/csv/}, one for each query.
+
+\textbf{Plain Text Report Module.} Its inputs are the analysis results. The module generates a plain-text version of the report suitable for viewing in any terminal or text editor. The output is a set of text files saved to \texttt{reports/text/}.
+
+\textbf{Per-Chat Deep Dive Module.} Its input is the data for each individual chat. The module generates HTML transcripts with tabbed views covering messages, media, URLs, metadata, and chain of custody. The output is a set of per-chat HTML reports saved to \texttt{extracted/chats/}.
+
+\textbf{Report Content Requirements.} Every report generated by the toolkit must embed the following elements:
+
+\begin{itemize}
+    \item Case ID, investigator name, badge ID, organisation, and warrant number.
+    \item Suspect phone number and device details.
+    \item Session ID and report generation timestamp.
+    \item Evidence file hashes (SHA-256 and MD5) sourced from \texttt{hash\_registry.txt}.
+    \item An ACPO compliance statement.
+    \item A chain-of-custody log excerpt.
+\end{itemize}
+
+The figure below illustrates the program design flow of the unified WhatsApp forensic toolkit for Android.
+
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=\textwidth]{assets/images/program_design_flow.png}
+    \caption{Program Design Flow of the Unified WhatsApp Forensic Toolkit for Android}
+    \label{fig:program_design_flow}
+\end{figure}
+
+% ═════════════════════════════════════════════════════════════════════════
+% REFERENCES
+% ═════════════════════════════════════════════════════════════════════════
+\newpage
+\bibliographystyle{apalike}
+\bibliography{references}
+
+\end{document}
